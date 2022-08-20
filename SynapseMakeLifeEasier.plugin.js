@@ -285,6 +285,7 @@
       
       load() {
           ZLibrary.PluginUpdater.checkForUpdate("SynapseMakeLifeEasier", "3.3.0", "https://raw.githubusercontent.com/SaphoGaming/synapsemakelifeeasier/main/SynapseMakeLifeEasier.plugin.js?token=GHSAT0AAAAAABX3BTG2ODKGBBDEOO7OZ7UQYYA3A5A")
+          console.log("Version 3.3.0")
       }
   
       start() {
