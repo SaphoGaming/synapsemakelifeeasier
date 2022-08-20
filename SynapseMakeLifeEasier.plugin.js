@@ -2,7 +2,7 @@
  * @name SynapseMakeLifeEasier
  * @author yorker
  * @description makes life easier for a monke. 
- * @version 3.5.0
+ * @version 3.3.0
  * @authorId 844997173790769183
  */
 
@@ -285,8 +285,8 @@
     
 
       load() {
-          ZLibrary.Logger.log("SynapseMakeLifeEaisier", `version 3.5.0 has started`)
-          ZLibrary.PluginUpdater.checkForUpdate("SynapseMakeLifeEasier", "3.5.0", "https://raw.githubusercontent.com/SaphoGaming/synapsemakelifeeasier/main/SynapseMakeLifeEasier.plugin.js")
+          ZLibrary.Logger.log("SynapseMakeLifeEasier", `version 3.3.0 has started`)
+          ZLibrary.PluginUpdater.checkForUpdate("SynapseMakeLifeEasier", "3.3.0", "https://raw.githubusercontent.com/SaphoGaming/synapsemakelifeeasier/main/SynapseMakeLifeEasier.plugin.js")
       }
   
       start() {
