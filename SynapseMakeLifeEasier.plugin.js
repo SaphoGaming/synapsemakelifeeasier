@@ -40,6 +40,7 @@ const config = {
             "type": "improved",
             "items": [
                 "**Changed the whole structure of the code**",
+                "**/ss command works again, it is now being sent to staff-bot**",
             ]
         },
     ]
