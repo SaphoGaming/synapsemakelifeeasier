@@ -282,10 +282,11 @@
   var regexNew = /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)/g
   
    module.exports = class ExamplePlugin { 
-      
+    
+
       load() {
+          ZLibrary.Logger.log("SynapseMakeLifeEaisier", `version 3.4.0 has started`)
           ZLibrary.PluginUpdater.checkForUpdate("SynapseMakeLifeEasier", "3.4.0", "https://raw.githubusercontent.com/SaphoGaming/synapsemakelifeeasier/main/SynapseMakeLifeEasier.plugin.js")
-          console.log("Version 3.3.0")
       }
   
       start() {
