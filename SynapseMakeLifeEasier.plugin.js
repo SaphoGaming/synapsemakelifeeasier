@@ -2,7 +2,7 @@
  * @name SynapseMakeLifeEasier
  * @author yorker
  * @description makes life easier for a monke. 
- * @version 3.2.0
+ * @version 3.3.0
  * @authorId 844997173790769183
  */
 
@@ -284,7 +284,7 @@
    module.exports = class ExamplePlugin { 
       
       load() {
-          ZLibrary.PluginUpdater.checkForUpdate("SynapseMakeLifeEasier", "3.2.0", "https://raw.githubusercontent.com/SaphoGaming/synapsemakelifeeasier/main/SynapseMakeLifeEasier.plugin.js")
+          ZLibrary.PluginUpdater.checkForUpdate("SynapseMakeLifeEasier", "3.3.0", "https://raw.githubusercontent.com/SaphoGaming/synapsemakelifeeasier/main/SynapseMakeLifeEasier.plugin.js")
       }
   
       start() {
