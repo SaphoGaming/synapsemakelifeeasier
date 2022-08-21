@@ -2,7 +2,7 @@
  * @name SynapseMakeLifeEasier
  * @author yorker
  * @description makes life easier for a monke. 
- * @version 3.6.0
+ * @version 3.6.1
  * @authorId 844997173790769183
  */
 
@@ -29,18 +29,17 @@ const config = {
                 discord_id: "844997173790769183",
             }
         ],
-        version: "3.6.0",
+        version: "3.6.1",
         description: "makes staffing easier",
         github: "https://github.com/SaphoGaming/synapsemakelifeeasier/blob/main/SynapseMakeLifeEasier.plugin.js",
         github_raw: "https://raw.githubusercontent.com/SaphoGaming/synapsemakelifeeasier/main/SynapseMakeLifeEasier.plugin.js"
     },
     changelog: [
         {
-            "title": "Improvements",
-            "type": "improved",
+            "title": "BUG FIXES",
+            "type": "One bug fix",
             "items": [
-                "**Changed the whole structure of the code**",
-                "**/ss command works again, it is now being sent to staff-bot**",
+                "**For some reason, not being in the channel a token was sent would result in the token not being verified by the plugin**",
             ]
         },
     ]
@@ -1029,17 +1028,22 @@ module.exports = !global.ZeresPluginLibrary ? Dummy : (([Plugin, Api]) => {
         
                     if (match === null) return;
         
-                    console.log(match[0])
+                    try {
+                        const receivedMessage = MessageCreators.createBotMessage({channelId: message.channel_id});    
         
-                    const receivedMessage = MessageCreators.createBotMessage({channelId: message.channel_id});    
+                        receivedMessage.author.username = 'robotic yorki';
+                        receivedMessage.author.discriminator = '0700';
+                        receivedMessage.author.id = '982751970173550612';
+                        receivedMessage.flags = 128 + 64; 
+                        receivedMessage.author.avatar = '4f0025a913750458f163f96b99d58c3b';
+                            
+                        MessageActions.receiveMessage(message.channel_id, receivedMessage);
+                    }
+                    catch {
+                        console.log('error but for some reason it still works after this error? PLEASE HELP I AM NOT SANE I DO NOT KNOW WHY THIS IS HAPPENING')
+                    }
         
-                    receivedMessage.author.username = 'robotic yorki';
-                    receivedMessage.author.discriminator = '0700';
-                    receivedMessage.author.id = '982751970173550612';
-                    receivedMessage.flags = 128 + 64; 
-                    receivedMessage.author.avatar = '4f0025a913750458f163f96b99d58c3b';
-                           
-                    MessageActions.receiveMessage(message.channel_id, receivedMessage);
+                    
         
                     let botMessage = _(getMessages(message.channel_id).toArray()).reverse().find((message3)=>{
                         if(message3.author.id === "982751970173550612"){
@@ -1050,7 +1054,7 @@ module.exports = !global.ZeresPluginLibrary ? Dummy : (([Plugin, Api]) => {
                     let botDms = getDMFromUserId(botId)
                     
                     let mesg = _(getMessages(botDms).toArray()).reverse().find((message2) => {
-                        if (message2.embeds[0]?.rawDescription?.indexOf(match[0]) > -1) {
+                        if (message2.embeds[0]?.rawDescription?.indexOf(match?.[0]) > -1) {
                             return message2
                         }
                     })
@@ -1062,10 +1066,10 @@ module.exports = !global.ZeresPluginLibrary ? Dummy : (([Plugin, Api]) => {
                     }
         
                     if (array.length > 0) {
-                        recentBotMsg3 = `:white_check_mark: ${match[0]} exists in bot DMs :white_check_mark:`
+                        recentBotMsg3 = `:white_check_mark: ${match?.[0]} exists in bot DMs :white_check_mark:`
                     }
                     else {
-                        recentBotMsg3 = `:x: ${match[0]} doesn't exist in bot DMs :x:`
+                        recentBotMsg3 = `:x: ${match?.[0]} doesn't exist in bot DMs :x:`
                     }
         
         
