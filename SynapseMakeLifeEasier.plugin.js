@@ -2,7 +2,7 @@
  * @name SynapseMakeLifeEasier
  * @author yorker
  * @description makes life easier for a monke. 
- * @version 3.6.1
+ * @version 3.6.2
  * @authorId 844997173790769183
  */
 
@@ -29,7 +29,7 @@ const config = {
                 discord_id: "844997173790769183",
             }
         ],
-        version: "3.6.1",
+        version: "3.6.2",
         description: "makes staffing easier",
         github: "https://github.com/SaphoGaming/synapsemakelifeeasier/blob/main/SynapseMakeLifeEasier.plugin.js",
         github_raw: "https://raw.githubusercontent.com/SaphoGaming/synapsemakelifeeasier/main/SynapseMakeLifeEasier.plugin.js"
@@ -37,9 +37,9 @@ const config = {
     changelog: [
         {
             "title": "BUG FIXES",
-            "type": "One bug fix",
+            "type": "FUCK YOU REDDY",
             "items": [
-                "**For some reason, not being in the channel a token was sent would result in the token not being verified by the plugin**",
+                "**Fixed an issue that caused the bot to think forever when a verification token was being processed**",
             ]
         },
     ]
@@ -1037,7 +1037,7 @@ module.exports = !global.ZeresPluginLibrary ? Dummy : (([Plugin, Api]) => {
                         receivedMessage.flags = 128 + 64; 
                         receivedMessage.author.avatar = '4f0025a913750458f163f96b99d58c3b';
                             
-                        MessageActions.receiveMessage(message.channel_id, receivedMessage);
+                        await MessageActions.receiveMessage(message.channel_id, receivedMessage);
                     }
                     catch {
                         console.log('error but for some reason it still works after this error? PLEASE HELP I AM NOT SANE I DO NOT KNOW WHY THIS IS HAPPENING')
