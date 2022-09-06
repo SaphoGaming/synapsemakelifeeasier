@@ -2,7 +2,7 @@
  * @name SynapseMakeLifeEasier
  * @author yorker
  * @description makes life easier for a monke. 
- * @version 3.6.2
+ * @version 3.6.3
  * @authorId 844997173790769183
  */
 
@@ -29,17 +29,22 @@ const config = {
                 discord_id: "844997173790769183",
             }
         ],
-        version: "3.6.2",
+        version: "3.6.3",
         description: "makes staffing easier",
         github: "https://github.com/SaphoGaming/synapsemakelifeeasier/blob/main/SynapseMakeLifeEasier.plugin.js",
         github_raw: "https://raw.githubusercontent.com/SaphoGaming/synapsemakelifeeasier/main/SynapseMakeLifeEasier.plugin.js"
     },
     changelog: [
         {
-            "title": "BUG FIXES",
-            "type": "FUCK YOU REDDY",
+            "title": "New Feature",
+            "type": "Features",
             "items": [
-                "**Fixed an issue that caused the bot to think forever when a verification token was being processed**",
+                "**Added command '/b !getp [username]', which gets the punishments of the specific user from the bot dm (only mods can use this)**",
+            ],
+            "title": "Code Changes",
+            "type": "Code changes",
+            "items": [
+                "**Recoded some more shit so it's faster in verifications now**",
             ]
         },
     ]
@@ -732,6 +737,7 @@ module.exports = !global.ZeresPluginLibrary ? Dummy : (([Plugin, Api]) => {
                         proceed = false;
         
         
+        
                         const receivedMessage = MessageCreators.createBotMessage({channelId: channel.id});    
                         receivedMessage.author.username = 'robotic yorki';
                         receivedMessage.author.discriminator = '0700';
@@ -757,45 +763,42 @@ module.exports = !global.ZeresPluginLibrary ? Dummy : (([Plugin, Api]) => {
                         let contentMessage = ''
         
                         let { getDMFromUserId } = BdApi.findModuleByProps("getDMFromUserId")
-        
-                        if (args.value.startsWith("!verf")) {
-                            let mesg = _(getMessages(channel.id).toArray()).reverse().find((message) => {
-                                if (message.author.id !== userid && message.author.id !== "982751970173550612" && message.author.id !== "983394662716952616" ) {
-                                    return message
+                        let botActualDM = getDMFromUserId(botId)
+                        let nigga = args.value.split(" ");
+
+                        switch (args.value.split(' ')[0]) {
+                            case '!verf':
+                                if (channel.recipients.length == 1) {
+                                    if (nigga.length > 2 || nigga.length == 1) {
+                                        receivedMessage2.content = ':x: Inside DMs, this command automatically fetches the user ID.:x:\n\n!verf <username>';
+                                        MessageActions.receiveMessage(channel.id, receivedMessage2);
+                                        return;
+                                    } 
+                                    delete obj[channel.recipients[0]]
+                                    contentMessage = `!verf ${channel.recipients[0]} ${nigga[1]}`
                                 }
-                             })
-                            let nigga = args.value.split(" ");
-                            let monkeyDMs = getDMFromUserId(mesg.author.id)
-                            if (channel.id === monkeyDMs) {
-                                if (nigga.length > 2 || nigga.length == 1) {
-                                    receivedMessage2.content = ':x: Inside DMs, this command automatically fetches the user ID.:x:\n\n!verf <username>';
-                                    MessageActions.receiveMessage(channel.id, receivedMessage2);
-                                    return;
-                                } 
-                                delete obj[mesg.author.id]
-                                contentMessage = `!verf ${mesg.author.id} ${nigga[1]}`
-                            }
-                            else {  
-                                if (nigga.length < 3) {
-                                    receivedMessage2.content = ':x: You need 3 arguments to use this command outside DMs.:x:\n\n!verf <userid> <username>';
-                                    MessageActions.receiveMessage(channel.id, receivedMessage2);
-                                    return;
-                                } 
+                                else {  
+                                    if (nigga.length < 3) {
+                                        receivedMessage2.content = ':x: You need 3 arguments to use this command outside DMs.:x:\n\n!verf <userid> <username>';
+                                        MessageActions.receiveMessage(channel.id, receivedMessage2);
+                                        return;
+                                    } 
+                                    contentMessage = args.value
+                                }
+                                break;
+                            case '!getp': 
+                                contentMessage = `!getpunishments ${nigga[1]}`
+                                break;
+                            default:
                                 contentMessage = args.value
-                            }
+                                break;
                         }
-                        else if (args.value.startsWith("!getp")) {
-                            let nigga2 = args.value.split(" ")
-                            contentMessage = `!getpunishments ${nigga2[1]}`
-                        }
-                        else {
-                            contentMessage = args.value
-                        }
+
         
                         proceed = false;
         
-                        BdApi.findModuleByProps('sendMessage').sendMessage(channelId, {content: contentMessage, tts: false, invalidEmojis: [], validNonShortcutEmojis: []}, undefined, {});
-        
+                        BdApi.findModuleByProps('sendMessage').sendMessage(contentMessage.startsWith('!getpunishments') ? botActualDM : channelId, {content: contentMessage, tts: false, invalidEmojis: [], validNonShortcutEmojis: []}, undefined, {});
+                        
                         await new Promise((resolve, reject) => {
                             let i = 0;
                             let interval = setInterval(() => {
