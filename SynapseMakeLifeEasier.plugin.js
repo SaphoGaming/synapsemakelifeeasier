@@ -40,11 +40,7 @@ const config = {
             "type": "Features",
             "items": [
                 "**Added command '/b !getp [username]', which gets the punishments of the specific user from the bot dm (only mods can use this)**",
-            ],
-            "title": "Code Changes",
-            "type": "Code changes",
-            "items": [
-                "**Recoded some more shit so it's faster in verifications now**",
+                "**Recoded some more shit to make verifications faster**",
             ]
         },
     ]
