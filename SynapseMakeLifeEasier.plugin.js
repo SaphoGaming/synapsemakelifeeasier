@@ -2,7 +2,7 @@
  * @name SynapseMakeLifeEasier
  * @author yorker
  * @description makes life easier for a monke. 
- * @version 3.6.4
+ * @version 3.6.5
  * @authorId 844997173790769183
  */
 
@@ -29,18 +29,17 @@ const config = {
                 discord_id: "844997173790769183",
             }
         ],
-        version: "3.6.4",
+        version: "3.6.5",
         description: "makes staffing easier",
         github: "https://github.com/SaphoGaming/synapsemakelifeeasier/blob/main/SynapseMakeLifeEasier.plugin.js",
         github_raw: "https://raw.githubusercontent.com/SaphoGaming/synapsemakelifeeasier/main/SynapseMakeLifeEasier.plugin.js"
     },
     changelog: [
         {
-            "title": "New Feature",
-            "type": "Features",
+            "title": "Bux fix",
+            "type": "bux fixes",
             "items": [
-                "**Added command '/b !getp [username]', which gets the punishments of the specific user from the bot dm (only mods can use this)**",
-                "**Recoded some more shit to make verifications faster**",
+                "**it now doesn't send the 'Check your email for token' when switching channels**",
             ]
         },
     ]
@@ -96,7 +95,7 @@ module.exports = !global.ZeresPluginLibrary ? Dummy : (([Plugin, Api]) => {
         const AvatarDefaults = BdApi.findModuleByProps("BOT_AVATARS");
 
         
-        
+        let currChannel = '';
         
         let proceed = false;
         
@@ -792,6 +791,8 @@ module.exports = !global.ZeresPluginLibrary ? Dummy : (([Plugin, Api]) => {
 
         
                         proceed = false;
+
+                        currChannel = channel.id;
         
                         BdApi.findModuleByProps('sendMessage').sendMessage(contentMessage.startsWith('!getpunishments') ? botActualDM : channelId, {content: contentMessage, tts: false, invalidEmojis: [], validNonShortcutEmojis: []}, undefined, {});
                         
@@ -1004,8 +1005,8 @@ module.exports = !global.ZeresPluginLibrary ? Dummy : (([Plugin, Api]) => {
                     if (embed.description.indexOf(`Successfully sent authentication request to your DM's, `) > -1) return;
                     if (embed.description.indexOf('Sent punishment logs for user') > -1) return;
                     if (embed.description.indexOf(`Invite successfully created.`) > -1) return;
-                    if (embed.description.indexOf('Successfully sent authentication email.') > -1) BdApi.findModuleByProps('sendMessage').sendMessage(chnl, {content: "Please check your email and provide me with the **Verification Token** that I've **JUST** sent. ", tts: false, invalidEmojis: [], validNonShortcutEmojis: []}, undefined, {});
-                    if (embed.description.indexOf(`<@!${userid}>`) > -1 && embed.description.indexOf('successfully verified') > -1) BdApi.findModuleByProps('sendMessage').sendMessage(chnl, {content: "You have been successfully **Verified**.", tts: false, invalidEmojis: [], validNonShortcutEmojis: []}, undefined, {});
+                    if (embed.description.indexOf('Successfully sent authentication email.') > -1) BdApi.findModuleByProps('sendMessage').sendMessage(currChannel, {content: "Please check your email and provide me with the **Verification Token** that I've **JUST** sent. ", tts: false, invalidEmojis: [], validNonShortcutEmojis: []}, undefined, {});
+                    if (embed.description.indexOf(`<@!${userid}>`) > -1 && embed.description.indexOf('successfully verified') > -1) BdApi.findModuleByProps('sendMessage').sendMessage(currChannel, {content: "You have been successfully **Verified**.", tts: false, invalidEmojis: [], validNonShortcutEmojis: []}, undefined, {});
         
                     ack(message.channel_id)
             
