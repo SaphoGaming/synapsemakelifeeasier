@@ -2,7 +2,7 @@
  * @name SynapseMakeLifeEasier
  * @author yorker
  * @description makes life easier for a monke. 
- * @version 3.6.5
+ * @version 3.7.0
  * @authorId 844997173790769183
  */
 
@@ -29,17 +29,20 @@ const config = {
                 discord_id: "844997173790769183",
             }
         ],
-        version: "3.6.5",
+        version: "3.7.0",
         description: "makes staffing easier",
         github: "https://github.com/SaphoGaming/synapsemakelifeeasier/blob/main/SynapseMakeLifeEasier.plugin.js",
         github_raw: "https://raw.githubusercontent.com/SaphoGaming/synapsemakelifeeasier/main/SynapseMakeLifeEasier.plugin.js"
     },
     changelog: [
         {
-            "title": "Bux fix",
-            "type": "bux fixes",
+            "title": "Changes",
+            "type": "Discord Changes",
             "items": [
-                "**it now doesn't send the 'Check your email for token' when switching channels**",
+                "**discord changed whole code structure, a lot of stuff removed**",
+                "**code reworked, some stuff missing**",
+                `**yorki commands, instead of "/" you have to use "." now, **`,
+                "please report any bugs",
             ]
         },
     ]
@@ -61,23 +64,25 @@ module.exports = !global.ZeresPluginLibrary ? Dummy : (([Plugin, Api]) => {
 
         PluginUpdater.checkForUpdate("SynapseMakeLifeEasier", config.info.version, "https://raw.githubusercontent.com/SaphoGaming/synapsemakelifeeasier/main/SynapseMakeLifeEasier.plugin.js")
 
-        const DiscordCommands = BdApi.findModuleByProps("BUILT_IN_COMMANDS");
-        const FluxDispatcher = WebpackModules.getByProps("dispatch", "subscribe")
-        const { clipboard } = require("electron");
+        const DiscordCommands = BdApi.Webpack.getModule(m => Array.isArray(m) && m.some(e => e?.applicationId) && m.some(e => e?.execute) && m.some(e => e?.inputType));
+        console.log(BdApi.Webpack.getModule(m => Array.isArray(m) && m.some(e => e.id)))
+        const FluxDispatcher = BdApi.Webpack.getModule(BdApi.Webpack.Filters.byProps("dispatch", "_actionHandlers"))
+        const clipboard  = BdApi.Webpack.getModule(BdApi.Webpack.Filters.byProps("clipboard")).clipboard
         let { lastMessageId } = BdApi.findModuleByProps("lastMessageId")
         let { getMessage, getMessages } = BdApi.findModuleByProps("getMessage", "getMessages")
         let moment = BdApi.findModuleByProps("locale")
         let { sendBotMessage } = BdApi.findModuleByProps("sendBotMessage")
         let dispatchStore = BdApi.findModuleByProps("dispatch", "subscribe")
         let dirtyDispatch = dispatchStore.dispatch.bind(dispatchStore)
-        const { showToast } = BdApi.findModuleByProps("showToast")
-        const AchievementToast = BdApi.findModuleByDisplayName("AchievementToast")
+        // const { showToast } = BdApi.findModuleByProps("showToast")
+        // const AchievementToast = BdApi.findModuleByDisplayName("AchievementToast")
         let {fetchForGuild, fetchForChannel} = BdApi.findModuleByProps("fetchForGuild", "fetchForChannel")
         let { createElement: ce } = BdApi.React
         let { fetchMessages } = BdApi.findModuleByProps("fetchMessages", "_tryFetchMessagesCached")
         let { getChannel } = BdApi.findModuleByProps("hasChannel", "getChannel")
         let { getUser } = BdApi.findModuleByProps("getUser")
-        const {ComponentDispatch} = BdApi.findModuleByProps("ComponentDispatch");
+        const ComponentDispatch = BdApi.Webpack.getModule(m => m.dispatchToLastSubscribed && m.emitter.listeners("INSERT_TEXT").length)
+
 
         const inviterequest = '910740526549053500'
         const channelId = '910740526549053500'; 
@@ -90,7 +95,8 @@ module.exports = !global.ZeresPluginLibrary ? Dummy : (([Plugin, Api]) => {
         let recentBotMsg3 = '';
         const currBotMsg = '';
         
-        const MessageCreators = BdApi.findModuleByProps("createBotMessage");
+        const MessageCreators = BdApi.Webpack.getModule(m => m.sendBotMessage);
+        console.log(MessageCreators)
         const MessageActions = BdApi.findModuleByProps("receiveMessage");
         const AvatarDefaults = BdApi.findModuleByProps("BOT_AVATARS");
 
@@ -231,6 +237,90 @@ module.exports = !global.ZeresPluginLibrary ? Dummy : (([Plugin, Api]) => {
                 drawFn(ctx)
             }
         }
+
+        function addCommands()
+        {
+            document.getElementsByClassName('markup-eYLPri editor-H2NA06 slateTextArea-27tjG0 fontSize16Padding-XoMpjI')[0].addEventListener('keydown', async function(e) {
+                if (e.keyCode === 13) {
+                    let text = document.getElementsByClassName('markup-eYLPri editor-H2NA06 slateTextArea-27tjG0 fontSize16Padding-XoMpjI')[0].children[0].children[0].children[0].children[0].textContent
+                    text = text.split(' ')
+
+                    
+                    if (text[0] == '.b') 
+                    {
+                        let channel = getChannel(BdApi.findModuleByProps("getLastSelectedChannelId", "getChannelId").getChannelId());
+                        await ComponentDispatch.dispatchToLastSubscribed("CLEAR_TEXT")
+                        let contentMessage = ''
+
+                        let { getDMFromUserId } = BdApi.findModuleByProps("getDMFromUserId")
+                        let botActualDM = getDMFromUserId(botId)
+                        let nigga = text.slice(1);
+                        console.log(nigga)
+
+                        switch (nigga[0]) {
+                            case '!verf':
+                                if (channel.recipients.length == 1) {
+                                    if (nigga.length > 2 || nigga.length == 1) {
+                                        MessageCreators.sendBotMessage(BdApi.findModuleByProps("getLastSelectedChannelId", "getChannelId").getChannelId(), ':x: Inside DMs, this command automatically fetches the user ID.:x:\n\n!verf <username>')
+                                        return;
+                                    } 
+                                    delete obj[channel.recipients[0]]
+                                    contentMessage = `!verf ${channel.recipients[0]} ${nigga[1]}`
+                                }
+                                else {  
+                                    if (nigga.length < 3) {
+                                        MessageCreators.sendBotMessage(BdApi.findModuleByProps("getLastSelectedChannelId", "getChannelId").getChannelId(), ':x: You need 3 arguments to use this command outside DMs.:x:\n\n!verf <userid> <username>')
+                                        return;
+                                    } 
+                                    contentMessage = `${nigga.join(" ")}`
+                                }
+                                break;
+                            case '!getp': 
+                                contentMessage = `!getpunishments ${nigga[1] !== undefined ? nigga[1] : ""}`
+                                console.log(nigga[1])
+                                break;
+                            default:
+                                contentMessage = `${nigga.join(" ")}`
+                                break;
+                        }
+
+        
+                        proceed = false;
+
+                        currChannel = BdApi.findModuleByProps("getLastSelectedChannelId", "getChannelId").getChannelId();
+        
+                        BdApi.findModuleByProps('sendMessage').sendMessage(contentMessage.startsWith('!getpunishments') ? botActualDM : contentMessage.startsWith('!unban') ? '1011089597171765288' : channelId, {content: contentMessage, tts: false, invalidEmojis: [], validNonShortcutEmojis: []}, undefined, {});
+                        
+                        await new Promise((resolve, reject) => {
+                            let i = 0;
+                            let interval = setInterval(() => {
+                                if (i > 7500) {
+                                    clearInterval(interval);
+                                    recentBotMsg = `<@!${botId}> didn't respond in time.`;
+                                    return resolve();
+                                }
+        
+                                if (proceed === true) {
+                                    clearInterval(interval);
+                                    proceed = false;
+                                    return resolve();
+                                }
+        
+                                i += 10;
+                            }, 10)
+                        })
+                        MessageCreators.sendBotMessage(currChannel, recentBotMsg)
+
+                    }
+                    else if (text[0] == ".q")
+                    {
+                        currChannel = BdApi.findModuleByProps("getLastSelectedChannelId", "getChannelId").getChannelId();
+                        await ComponentDispatch.dispatchToLastSubscribed("CLEAR_TEXT")
+                        BdApi.findModuleByProps('sendMessage').sendMessage(currChannel, {content: "Please state your **Synapse X** username.", tts: false, invalidEmojis: [], validNonShortcutEmojis: []}, undefined, {});
+                    }
+                }
+            })
+        }
         
         function checkForFix(msg){
             var responseF = ``
@@ -332,12 +422,48 @@ module.exports = !global.ZeresPluginLibrary ? Dummy : (([Plugin, Api]) => {
           
         var regexNew = /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)/g
 
+        let cmd = '';
+
+        const targetNode = document.getElementsByClassName('content-1SgpWY')[0]
+
+        const callback = async (mutationList, observer) => {
+            for (const mutation of mutationList) { 
+                mutation.removedNodes.forEach((node) => {
+                    if (node.className == "chatContent-3KubbW")
+                    {
+                        console.log('refreshed')
+                        addCommands();
+                    }
+                })
+                mutation.addedNodes.forEach((node) => {
+                    if (node.className == "chat-2ZfjoI")
+                    {
+                       console.log('added')
+                       addCommands();
+                    }
+                })
+            }
+          };
+
+
+        const observer = new MutationObserver(callback);
+
         return class SynapseMakeLifeEasier extends Plugin {
             
-
+                
             onStart() {
+
+                addCommands();
         
+                const config = { attributes: true, childList: true, subtree: true };
+                // Start observing the target node for configured mutations
+                observer.observe(targetNode, config);
+
                 const MESGID = document.addEventListener('keydown', this.handleKeyDown)
+
+    
+
+
         
                 let { getDMFromUserId } = BdApi.findModuleByProps("getDMFromUserId")
                 let botDM = getDMFromUserId(botId)
@@ -366,95 +492,94 @@ module.exports = !global.ZeresPluginLibrary ? Dummy : (([Plugin, Api]) => {
                 //       component: ce(Component)
                 //       }
                 //   })
-                DiscordCommands.BUILT_IN_COMMANDS.push({
-                    __registerId: "bot2",
-                    applicationId: "betterdiscord",
-                    name: "ss",
-                    displayName: "ss",
-                    description: "screenshot",
-                    displayDescription: "screenshot",
-                    id: "bot-synapse2",
-                    type: 1,
-                    target: 1,
-                    predicate: () => true,
-                    execute: async ([args], {channel}) => {
+                // DiscordCommands.push({
+                //     applicationId: "bot2",
+                //     name: "ss",
+                //     displayName: "ss",
+                //     description: "screenshot",
+                //     displayDescription: "screenshot",
+                //     inputType: 0,
+                //     id: "bot-synapse",
+                //     type: 1,
+                //     predicate: () => true,
+                //     execute: async ([args], {channel}) => {
         
-                        let { getDMFromUserId } = BdApi.findModuleByProps("getDMFromUserId")
+                //         let { getDMFromUserId } = BdApi.findModuleByProps("getDMFromUserId")
         
-                        let botDM = getDMFromUserId(botId)
+                //         let botDM = getDMFromUserId(botId)
         
-                        fetchMessages({
-                            channelId: botDM, 
-                            limit: 20, 
-                            isPreload: undefined
-                        })
+                //         fetchMessages({
+                //             channelId: botDM, 
+                //             limit: 20, 
+                //             isPreload: undefined
+                //         })
         
-                      await fetchMessages({
-                            channelId: channel.id, 
-                            limit: 20, 
-                            isPreload: undefined
-                        })
+                //       await fetchMessages({
+                //             channelId: channel.id, 
+                //             limit: 20, 
+                //             isPreload: undefined
+                //         })
         
         
-                        const receivedMessage = MessageCreators.createBotMessage({channelId: channel.id});    
-                        receivedMessage.author.username = 'robotic yorki';
-                        receivedMessage.author.discriminator = '0700';
-                        receivedMessage.author.id = '982751970173550612';
-                        receivedMessage.flags = 128 + 64;
-                        receivedMessage.author.avatar = '4f0025a913750458f163f96b99d58c3b';
-                        MessageActions.receiveMessage(channel.id, receivedMessage);
+                //         const receivedMessage = MessageCreators.createBotMessage({channelId: channel.id});    
+                //         receivedMessage.author.username = 'robotic yorki';
+                //         receivedMessage.author.discriminator = '0700';
+                //         receivedMessage.author.id = '982751970173550612';
+                //         receivedMessage.flags = 128 + 64;
+                //         receivedMessage.author.avatar = '4f0025a913750458f163f96b99d58c3b';
+                //         MessageActions.receiveMessage(channel.id, receivedMessage);
         
-                        let botMessage = _(getMessages(channel.id).toArray()).reverse().find((message)=>{
-                            if(message.author.id === "982751970173550612"){
-                                return message
-                            }
-                        })
+                //         let botMessage = _(getMessages(channel.id).toArray()).reverse().find((message)=>{
+                //             if(message.author.id === "982751970173550612"){
+                //                 return message
+                //             }
+                //         })
         
-                        const regex = /([a-z0-9]){8}-([a-z0-9]){4}-([a-z0-9]){4}-([a-z0-9]){4}-([a-z0-9]){12}/g
+                //         const regex = /([a-z0-9]){8}-([a-z0-9]){4}-([a-z0-9]){4}-([a-z0-9]){4}-([a-z0-9]){12}/g
         
-                        let match3 = ''
+                //         let match3 = ''
         
-                        let message3 = _(getMessages(channel.id).toArray()).reverse().find((message5) => {
-                            let match = regex.exec(message5?.content)
-                            if (match === null) return;
-                            match3 = match;
-                            if (message5.author.id !== userid && message5.author.id !== "982751970173550612" && message5.author.id !== "983394662716952616") {
-                                return message5
-                            }
-                        })
+                //         let message3 = _(getMessages(channel.id).toArray()).reverse().find((message5) => {
+                //             let match = regex.exec(message5?.content)
+                //             if (match === null) return;
+                //             match3 = match;
+                //             if (message5.author.id !== userid && message5.author.id !== "982751970173550612" && message5.author.id !== "983394662716952616") {
+                //                 return message5
+                //             }
+                //         })
         
             
                     
         
-                        if (message3 === undefined) {
-                            await new Promise(r => setTimeout(r,  2000));
-                            setTimeout(()=>{
-                                let newBotMessage = Object.assign(botMessage, {editedTimestamp: moment()})
-                                newBotMessage.flags = 64;
-                                newBotMessage.content = ":x: Couldn't find any token :x:";
-                                dirtyDispatch({type: "MESSAGE_UPDATE", message: newBotMessage})
-                            }, 50)
-                            return;
-                        }
+                //         if (message3 === undefined) {
+                //             await new Promise(r => setTimeout(r,  2000));
+                //             setTimeout(()=>{
+                //                 let newBotMessage = Object.assign(botMessage, {editedTimestamp: moment()})
+                //                 newBotMessage.flags = 64;
+                //                 newBotMessage.content = ":x: Couldn't find any token :x:";
+                //                 dirtyDispatch({type: "MESSAGE_UPDATE", message: newBotMessage})
+                //             }, 50)
+                //             return;
+                //         }
         
                 
         
-                        let split = message3.timestamp._d.toString().split(" ")
+                //         let split = message3.timestamp._d.toString().split(" ")
                         
-                        let split2 = split[4].toString().split(":")
+                //         let split2 = split[4].toString().split(":")
         
-                        let finaldate = split2[0];
+                //         let finaldate = split2[0];
         
-                        let finaldate2 = split2[0];
+                //         let finaldate2 = split2[0];
         
                        
-                        finaldate = newDate(finaldate);
+                //         finaldate = newDate(finaldate);
         
-                        finaldate2 = amORpm(finaldate2);
+                //         finaldate2 = amORpm(finaldate2);
         
         
         
-                      //  create ascii art from punctuation marks an image of a horse
+                //       //  create ascii art from punctuation marks an image of a horse
         
                     
         
@@ -462,16 +587,16 @@ module.exports = !global.ZeresPluginLibrary ? Dummy : (([Plugin, Api]) => {
         
         
         
-                        var canvas = document.createElement('canvas');
-                        canvas.height = 80;
-                        canvas.width = 572;
-                        var ctx = canvas.getContext('2d');
-                        ctx.fillStyle = '#36393f';
-                        ctx.fillRect(0, 0, canvas.width, canvas.height);
+                //         var canvas = document.createElement('canvas');
+                //         canvas.height = 80;
+                //         canvas.width = 572;
+                //         var ctx = canvas.getContext('2d');
+                //         ctx.fillStyle = '#36393f';
+                //         ctx.fillRect(0, 0, canvas.width, canvas.height);
         
-                        let image = `https://cdn.discordapp.com/avatars/${message3.author.id}/${message3.author.avatar}.webp?size=80`
+                //         let image = `https://cdn.discordapp.com/avatars/${message3.author.id}/${message3.author.avatar}.webp?size=80`
         
-                        //add image
+                //         //add image
         
         
                        
@@ -479,413 +604,408 @@ module.exports = !global.ZeresPluginLibrary ? Dummy : (([Plugin, Api]) => {
         
                 
         
-                        // ctx.strokeRect(0, 0, canvas.width, canvas.height);
+                //         // ctx.strokeRect(0, 0, canvas.width, canvas.height);
         
-                        const username = message3.author.username;
-                        const token = match3[0];
-                        const date = `${finaldate[0]}:${split2[1]} ${finaldate2}`;
+                //         const username = message3.author.username;
+                //         const token = match3[0];
+                //         const date = `${finaldate[0]}:${split2[1]} ${finaldate2}`;
                       
-                        ctx.font = '18px Whitney, "Helvetica Neue", Helvetica, Arial, sans-serif';
-                        ctx.fillStyle = '#fff';
-                        ctx.strokeStyle = 'black'
-                        ctx.textAlign = 'left';
-                        ctx.fillText(username, 90, 31);
+                //         ctx.font = '18px Whitney, "Helvetica Neue", Helvetica, Arial, sans-serif';
+                //         ctx.fillStyle = '#fff';
+                //         ctx.strokeStyle = 'black'
+                //         ctx.textAlign = 'left';
+                //         ctx.fillText(username, 90, 31);
         
-                        ctx.font = '17px Whitney, "Helvetica Neue", Helvetica, Arial, sans-serif';
-                        ctx.fillStyle = '#caccce';
-                        ctx.strokeStyle = 'black'
-                        ctx.textAlign = 'left';
-                        ctx.fillText(token, 90, 60);
+                //         ctx.font = '17px Whitney, "Helvetica Neue", Helvetica, Arial, sans-serif';
+                //         ctx.fillStyle = '#caccce';
+                //         ctx.strokeStyle = 'black'
+                //         ctx.textAlign = 'left';
+                //         ctx.fillText(token, 90, 60);
         
-                        // function that rounds to the nearest 10#
+                //         // function that rounds to the nearest 10#
         
-                        function round(num) {
-                            return Math.ceil(num / 10) * 10;
-                        }
+                //         function round(num) {
+                //             return Math.ceil(num / 10) * 10;
+                //         }
         
-                        console.log(round(Math.round(ctx.measureText(username).width)))
-        
-                        
-                        
-                        const lol = round(Math.round(ctx.measureText(username).width) + (Math.round(ctx.measureText(username).width / 100) * 4)) - 119
+                //         console.log(round(Math.round(ctx.measureText(username).width)))
         
                         
                         
-                        ctx.font = '14px Whitney, "Helvetica Neue", Helvetica, Arial, sans-serif';
-                        ctx.fillStyle = '#a3a6aa';
-                        ctx.fillText(`Today at ${date}`, 218 + lol , 31);
+                //         const lol = round(Math.round(ctx.measureText(username).width) + (Math.round(ctx.measureText(username).width / 100) * 4)) - 119
+        
+                        
+                        
+                //         ctx.font = '14px Whitney, "Helvetica Neue", Helvetica, Arial, sans-serif';
+                //         ctx.fillStyle = '#a3a6aa';
+                //         ctx.fillText(`Today at ${date}`, 218 + lol , 31);
         
         
-                        await new Promise(r => setTimeout(r,  350));
+                //         await new Promise(r => setTimeout(r,  350));
         
                         
         
-                        var img = new Image();
+                //         var img = new Image();
         
-                        img.onload = () => {
-                            ctx.beginPath();
-                            ctx.arc(40,40,25,0,Math.PI*2,true);
-                            ctx.closePath();
-                            ctx.clip();
-                            ctx.imageSmoothingQuality = 'high';
-                            ctx.drawImage(img, 15, 15, 50, 50);
-                        };
-                        img.setAttribute('crossOrigin','anonymous');
-                        img.src = image.toString(); 
+                //         img.onload = () => {
+                //             ctx.beginPath();
+                //             ctx.arc(40,40,25,0,Math.PI*2,true);
+                //             ctx.closePath();
+                //             ctx.clip();
+                //             ctx.imageSmoothingQuality = 'high';
+                //             ctx.drawImage(img, 15, 15, 50, 50);
+                //         };
+                //         img.setAttribute('crossOrigin','anonymous');
+                //         img.src = image.toString(); 
         
                     
                         
-                        await new Promise(r => setTimeout(r, 350));
+                //         await new Promise(r => setTimeout(r, 350));
                     
-                        // ctx.beginPath();
-                        // ctx.arc(40,40,25,0,Math.PI*2,true);
-                        // ctx.fillStyle = '#36393f';
-                        // ctx.fill();
-                        // ctx.closePath();
-                        // ctx.clip();
-                        // ctx.imageSmoothingQuality = 'high';
-                        // ctx.drawImage(img, 15, 15, 50, 50);
+                //         // ctx.beginPath();
+                //         // ctx.arc(40,40,25,0,Math.PI*2,true);
+                //         // ctx.fillStyle = '#36393f';
+                //         // ctx.fill();
+                //         // ctx.closePath();
+                //         // ctx.clip();
+                //         // ctx.imageSmoothingQuality = 'high';
+                //         // ctx.drawImage(img, 15, 15, 50, 50);
         
                         
-                        try {
-                            var img2 = canvas.toDataURL('image/jpeg', 0.9).split(',')[1];
-                        } catch(e) {
-                            var img2 = canvas.toDataURL().split(',')[1];
-                        }
+                //         try {
+                //             var img2 = canvas.toDataURL('image/jpeg', 0.9).split(',')[1];
+                //         } catch(e) {
+                //             var img2 = canvas.toDataURL().split(',')[1];
+                //         }
         
-                        let readyImage = ''
+                //         let readyImage = ''
         
                     
                         
-                    await fetch("https://api.imgur.com/3/image/", {
-                        method: "post",
-                        headers: {
-                            Authorization: "Client-ID 2f30b05e58882e9"
-                        },
-                        body: img2
-                    }).then(data => data.json()).then(async data => {
-                        readyImage = await data.data.link
-                        readyImage += "\n"
-                    })
+                //     await fetch("https://api.imgur.com/3/image/", {
+                //         method: "post",
+                //         headers: {
+                //             Authorization: "Client-ID 2f30b05e58882e9"
+                //         },
+                //         body: img2
+                //     }).then(data => data.json()).then(async data => {
+                //         readyImage = await data.data.link
+                //         readyImage += "\n"
+                //     })
         
                     
-                    let mesg = _(getMessages(botDM).toArray()).reverse().find((message2) => {
-                        if (message2.embeds[0]?.rawDescription?.indexOf(match3[0]) > -1) {
-                            return message2
-                        }
-                    })
+                //     let mesg = _(getMessages(botDM).toArray()).reverse().find((message2) => {
+                //         if (message2.embeds[0]?.rawDescription?.indexOf(match3[0]) > -1) {
+                //             return message2
+                //         }
+                //     })
         
-                    if (mesg ===  undefined) {
-                        await new Promise(r => setTimeout(r,  2000));
-                        setTimeout(()=>{
-                            let newBotMessage = Object.assign(botMessage, {editedTimestamp: moment()})
-                            newBotMessage.flags = 64;
-                            newBotMessage.content = ":x: Couldn't find token in bot DMs :x:";
-                            dirtyDispatch({type: "MESSAGE_UPDATE", message: newBotMessage})
-                        }, 50)
-                        return;
+                //     if (mesg ===  undefined) {
+                //         await new Promise(r => setTimeout(r,  2000));
+                //         setTimeout(()=>{
+                //             let newBotMessage = Object.assign(botMessage, {editedTimestamp: moment()})
+                //             newBotMessage.flags = 64;
+                //             newBotMessage.content = ":x: Couldn't find token in bot DMs :x:";
+                //             dirtyDispatch({type: "MESSAGE_UPDATE", message: newBotMessage})
+                //         }, 50)
+                //         return;
         
-                    }
+                //     }
                     
-                    var canvas2 = document.createElement('canvas');
-                    canvas2.height = 420;
-                    canvas2.width = 1400;
+                //     var canvas2 = document.createElement('canvas');
+                //     canvas2.height = 420;
+                //     canvas2.width = 1400;
         
-                    canvas2.style.width = canvas2.width / 3 + "px";
-                    canvas2.style.height = canvas2.height / 3 + "px";
+                //     canvas2.style.width = canvas2.width / 3 + "px";
+                //     canvas2.style.height = canvas2.height / 3 + "px";
         
-                    var ctx2 = canvas2.getContext('2d')
+                //     var ctx2 = canvas2.getContext('2d')
                 
         
-                    var scale = 1600/500;
-                    ctx2.setTransform(scale,0,0,scale,0,0);
+                //     var scale = 1600/500;
+                //     ctx2.setTransform(scale,0,0,scale,0,0);
         
         
-                    ctx2.fillStyle = '#36393f';
-                    ctx2.fillRect(0, 0, canvas2.width, canvas2.height);
+                //     ctx2.fillStyle = '#36393f';
+                //     ctx2.fillRect(0, 0, canvas2.width, canvas2.height);
         
-                    const regex2 = /(?!User Email)(?<=\:..).*\w+/g
-        
-        
-                    const email = regex2.exec(mesg.embeds[0].rawDescription);
-                    const ID = mesg.embeds[0].footer.text
+                //     const regex2 = /(?!User Email)(?<=\:..).*\w+/g
         
         
-                    if (email === null || ID === null) return;
+                //     const email = regex2.exec(mesg.embeds[0].rawDescription);
+                //     const ID = mesg.embeds[0].footer.text
         
         
-                    ctx2.beginPath();
-                    ctx2.roundRect(30, 6, 370, 120, 6);
-                    ctx2.fillStyle = '#2f3136';
-                    ctx2.fill();
-                    ctx2.closePath()
-                    ctx2.clip()
-                    ctx2.font = '12px Whitney, "Helvetica Neue", Helvetica, Arial, sans-serif';
-                    ctx2.fillStyle = '#FFFF';
-                    ctx2.textAlign = 'left';
-                    ctx2.fillText("SX Bot", 45, 35);
+                //     if (email === null || ID === null) return;
         
         
-                    ctx2.font = '10px Whitney, "Helvetica Neue", Helvetica, Arial, sans-serif';
-                    ctx2.fillStyle = '#DCDDDE';
-                    ctx2.textAlign = 'left';
-                    ctx2.fillText("Successfully sent authentication email. Please verify the following info:", 45, 56);
+                //     ctx2.beginPath();
+                //     ctx2.roundRect(30, 6, 370, 120, 6);
+                //     ctx2.fillStyle = '#2f3136';
+                //     ctx2.fill();
+                //     ctx2.closePath()
+                //     ctx2.clip()
+                //     ctx2.font = '12px Whitney, "Helvetica Neue", Helvetica, Arial, sans-serif';
+                //     ctx2.fillStyle = '#FFFF';
+                //     ctx2.textAlign = 'left';
+                //     ctx2.fillText("SX Bot", 45, 35);
         
-                    ctx2.font = '11px Whitney, "Helvetica Neue", Helvetica, Arial, sans-serif';
-                    ctx2.fillStyle = '#DCDDDE';
-                    ctx2.textAlign = 'left';
-                    ctx2.fillText("User Email:", 45, 85);
+        
+                //     ctx2.font = '10px Whitney, "Helvetica Neue", Helvetica, Arial, sans-serif';
+                //     ctx2.fillStyle = '#DCDDDE';
+                //     ctx2.textAlign = 'left';
+                //     ctx2.fillText("Successfully sent authentication email. Please verify the following info:", 45, 56);
+        
+                //     ctx2.font = '11px Whitney, "Helvetica Neue", Helvetica, Arial, sans-serif';
+                //     ctx2.fillStyle = '#DCDDDE';
+                //     ctx2.textAlign = 'left';
+                //     ctx2.fillText("User Email:", 45, 85);
         
         
-                    ctx2.font = '11px Whitney, "Helvetica Neue", Helvetica, Arial, sans-serif';
-                    ctx2.fillStyle = '#DCDDDE';
-                    ctx2.textAlign = 'left';
-                    ctx2.fillText("Verification Token:", 45, 100);
+                //     ctx2.font = '11px Whitney, "Helvetica Neue", Helvetica, Arial, sans-serif';
+                //     ctx2.fillStyle = '#DCDDDE';
+                //     ctx2.textAlign = 'left';
+                //     ctx2.fillText("Verification Token:", 45, 100);
                     
                 
-                    ctx2.beginPath();
-                    ctx2.roundRect(30, 6, 3.5, 160, 2.72);
-                    ctx2.fillStyle = '#fff';
-                    ctx2.fill();
+                //     ctx2.beginPath();
+                //     ctx2.roundRect(30, 6, 3.5, 160, 2.72);
+                //     ctx2.fillStyle = '#fff';
+                //     ctx2.fill();
         
-                    ctx2.beginPath();
-                    ctx2.roundRect(105, 75.5, ctx2.measureText(email).width - (ctx2.measureText(email).width / 10) , 13.5, 2.72);
-                    ctx2.fillStyle = '#202225';
-                    ctx2.fill();
+                //     ctx2.beginPath();
+                //     ctx2.roundRect(105, 75.5, ctx2.measureText(email).width - (ctx2.measureText(email).width / 10) , 13.5, 2.72);
+                //     ctx2.fillStyle = '#202225';
+                //     ctx2.fill();
         
-                    ctx2.font = '9px Whitney, "Helvetica Neue", Helvetica, Arial, sans-serif';
-                    ctx2.fillStyle = '#fff';
-                    ctx2.textAlign = 'left';
-                    ctx2.fillText(email, 110, 85);
-        
-        
-                    ctx2.beginPath();
-                    ctx2.roundRect(138, 90, 170, 13.5,2);
-                    ctx2.fillStyle = '#202225';
-                    ctx2.fill();
-        
-                    ctx2.font = '9px Whitney, "Helvetica Neue", Helvetica, Arial, sans-serif';
-                    ctx2.fillStyle = '#fff';
-                    ctx2.textAlign = 'left';
-                    ctx2.fillText(token, 143, 100);
+                //     ctx2.font = '9px Whitney, "Helvetica Neue", Helvetica, Arial, sans-serif';
+                //     ctx2.fillStyle = '#fff';
+                //     ctx2.textAlign = 'left';
+                //     ctx2.fillText(email, 110, 85);
         
         
-                    ctx2.font = '9px Whitney, "Helvetica Neue", Helvetica, Arial, sans-serif';
-                    ctx2.fillStyle = '#fff';
-                    ctx2.textAlign = 'left';
-                    ctx2.fillText(ID + ` • Today at ${date}`, 45, 118);
+                //     ctx2.beginPath();
+                //     ctx2.roundRect(138, 90, 170, 13.5,2);
+                //     ctx2.fillStyle = '#202225';
+                //     ctx2.fill();
+        
+                //     ctx2.font = '9px Whitney, "Helvetica Neue", Helvetica, Arial, sans-serif';
+                //     ctx2.fillStyle = '#fff';
+                //     ctx2.textAlign = 'left';
+                //     ctx2.fillText(token, 143, 100);
         
         
-                    ctx2.closePath()
+                //     ctx2.font = '9px Whitney, "Helvetica Neue", Helvetica, Arial, sans-serif';
+                //     ctx2.fillStyle = '#fff';
+                //     ctx2.textAlign = 'left';
+                //     ctx2.fillText(ID + ` • Today at ${date}`, 45, 118);
         
-                    try {
-                        var img3 = canvas2.toDataURL('image/jpeg', 0.9).split(',')[1];
-                    } catch(e) {
-                        var img3 = canvas2.toDataURL().split(',')[1];
-                    }
         
-                    let readyImage2 = ''
+                //     ctx2.closePath()
+        
+                //     try {
+                //         var img3 = canvas2.toDataURL('image/jpeg', 0.9).split(',')[1];
+                //     } catch(e) {
+                //         var img3 = canvas2.toDataURL().split(',')[1];
+                //     }
+        
+                //     let readyImage2 = ''
                         
-                    await fetch("https://api.imgur.com/3/image/", {
-                        method: "post",
-                        headers: {
-                            Authorization: "Client-ID 2f30b05e58882e9"
-                        },
-                        body: img3
-                    }).then(data => data.json()).then(async data => {
-                        readyImage += await data.data.link;
-                        BdApi.findModuleByProps('_sendMessage').sendMessage(inviterequest, {content: readyImage, tts: false, invalidEmojis: [], validNonShortcutEmojis: []}, undefined, {});
-                    })
+                //     await fetch("https://api.imgur.com/3/image/", {
+                //         method: "post",
+                //         headers: {
+                //             Authorization: "Client-ID 2f30b05e58882e9"
+                //         },
+                //         body: img3
+                //     }).then(data => data.json()).then(async data => {
+                //         readyImage += await data.data.link;
+                //         BdApi.findModuleByProps('_sendMessage').sendMessage(inviterequest, {content: readyImage, tts: false, invalidEmojis: [], validNonShortcutEmojis: []}, undefined, {});
+                //     })
         
         
-                    setTimeout(()=>{
-                        let newBotMessage = Object.assign(botMessage, {editedTimestamp: moment()})
-                        newBotMessage.flags = 64;
-                        newBotMessage.content = `:white_check_mark: Successfully sent in the <#${inviterequest}> channel! :white_check_mark:`;
-                        dirtyDispatch({type: "MESSAGE_UPDATE", message: newBotMessage})
-                    }, 50)
+                //     setTimeout(()=>{
+                //         let newBotMessage = Object.assign(botMessage, {editedTimestamp: moment()})
+                //         newBotMessage.flags = 64;
+                //         newBotMessage.content = `:white_check_mark: Successfully sent in the <#${inviterequest}> channel! :white_check_mark:`;
+                //         dirtyDispatch({type: "MESSAGE_UPDATE", message: newBotMessage})
+                //     }, 50)
                      
-                    }
+                //     }
         
-                })
+                // })
         
-                DiscordCommands.BUILT_IN_COMMANDS.push({
-                    __registerId: "bot2",
-                    applicationId: "betterdiscord",
-                    name: "b",
-                    displayName: "b",
-                    description: "sends to staffbot",
-                    displayDescription: "sends to staffbot",
-                    id: "bot-synapse",
-                    type: 1,
-                    target: 1,
-                    predicate: () => true,
-                    options: [{
-                        description: "",
-                        displayDescription: "",
-                        displayName: "message",
-                        name: "message",
-                        type: 3
-                    }],
-                    execute: async ([args], {channel}) => {
+                // DiscordCommands.push({
+                //     applicationId: "betterdiscord",
+                //     name: "b",
+                //     displayName: "b",
+                //     description: "sends to staffbot",
+                //     displayDescription: "sends to staffbot",
+                //     id: "bot-synapse3",
+                //     type: 1,
+                //     target: 1,
+                //     predicate: () => true,
+                //     options: [{
+                //         description: "",
+                //         displayDescription: "",
+                //         displayName: "message",
+                //         name: "message",
+                //         type: 3
+                //     }],
+                //     execute: async ([args], {channel}) => {
                     
-                        proceed = false;
+                //         proceed = false;
         
         
         
-                        const receivedMessage = MessageCreators.createBotMessage({channelId: channel.id});    
-                        receivedMessage.author.username = 'robotic yorki';
-                        receivedMessage.author.discriminator = '0700';
-                        receivedMessage.author.id = '982751970173550612';
-                        receivedMessage.flags = 128 + 64;
-                        receivedMessage.author.avatar = '4f0025a913750458f163f96b99d58c3b';
+                //         const receivedMessage = MessageCreators.createBotMessage({channelId: channel.id});    
+                //         receivedMessage.author.username = 'robotic yorki';
+                //         receivedMessage.author.discriminator = '0700';
+                //         receivedMessage.author.id = '982751970173550612';
+                //         receivedMessage.flags = 128 + 64;
+                //         receivedMessage.author.avatar = '4f0025a913750458f163f96b99d58c3b';
         
-                        const receivedMessage2 = MessageCreators.createBotMessage({channelId: channel.id}); 
-                        receivedMessage2.author.username = 'robotic yorki';
-                        receivedMessage2.author.discriminator = '0700';
-                        receivedMessage2.author.id = '982751970173550612';
-                        receivedMessage2.flags = 64;
-                        receivedMessage2.author.avatar = '4f0025a913750458f163f96b99d58c3b';
+                //         const receivedMessage2 = MessageCreators.createBotMessage({channelId: channel.id}); 
+                //         receivedMessage2.author.username = 'robotic yorki';
+                //         receivedMessage2.author.discriminator = '0700';
+                //         receivedMessage2.author.id = '982751970173550612';
+                //         receivedMessage2.flags = 64;
+                //         receivedMessage2.author.avatar = '4f0025a913750458f163f96b99d58c3b';
                                
-                        MessageActions.receiveMessage(channel.id, receivedMessage);
+                //         MessageActions.receiveMessage(channel.id, receivedMessage);
         
-                        let botMessage = _(getMessages(channel.id).toArray()).reverse().find((message)=>{
-                            if(message.author.id === "982751970173550612"){
-                                return message
-                            }
-                        })
+                //         let botMessage = _(getMessages(channel.id).toArray()).reverse().find((message)=>{
+                //             if(message.author.id === "982751970173550612"){
+                //                 return message
+                //             }
+                //         })
         
-                        let contentMessage = ''
+                //         let contentMessage = ''
         
-                        let { getDMFromUserId } = BdApi.findModuleByProps("getDMFromUserId")
-                        let botActualDM = getDMFromUserId(botId)
-                        let nigga = args.value.split(" ");
+                //         let { getDMFromUserId } = BdApi.findModuleByProps("getDMFromUserId")
+                //         let botActualDM = getDMFromUserId(botId)
+                //         let nigga = args.value.split(" ");
 
-                        switch (args.value.split(' ')[0]) {
-                            case '!verf':
-                                if (channel.recipients.length == 1) {
-                                    if (nigga.length > 2 || nigga.length == 1) {
-                                        receivedMessage2.content = ':x: Inside DMs, this command automatically fetches the user ID.:x:\n\n!verf <username>';
-                                        MessageActions.receiveMessage(channel.id, receivedMessage2);
-                                        return;
-                                    } 
-                                    delete obj[channel.recipients[0]]
-                                    contentMessage = `!verf ${channel.recipients[0]} ${nigga[1]}`
-                                }
-                                else {  
-                                    if (nigga.length < 3) {
-                                        receivedMessage2.content = ':x: You need 3 arguments to use this command outside DMs.:x:\n\n!verf <userid> <username>';
-                                        MessageActions.receiveMessage(channel.id, receivedMessage2);
-                                        return;
-                                    } 
-                                    contentMessage = args.value
-                                }
-                                break;
-                            case '!getp': 
-                                contentMessage = `!getpunishments ${nigga[1]}`
-                                break;
-                            default:
-                                contentMessage = args.value
-                                break;
-                        }
+                //         switch (args.value.split(' ')[0]) {
+                //             case '!verf':
+                //                 if (channel.recipients.length == 1) {
+                //                     if (nigga.length > 2 || nigga.length == 1) {
+                //                         receivedMessage2.content = ':x: Inside DMs, this command automatically fetches the user ID.:x:\n\n!verf <username>';
+                //                         MessageActions.receiveMessage(channel.id, receivedMessage2);
+                //                         return;
+                //                     } 
+                //                     delete obj[channel.recipients[0]]
+                //                     contentMessage = `!verf ${channel.recipients[0]} ${nigga[1]}`
+                //                 }
+                //                 else {  
+                //                     if (nigga.length < 3) {
+                //                         receivedMessage2.content = ':x: You need 3 arguments to use this command outside DMs.:x:\n\n!verf <userid> <username>';
+                //                         MessageActions.receiveMessage(channel.id, receivedMessage2);
+                //                         return;
+                //                     } 
+                //                     contentMessage = args.value
+                //                 }
+                //                 break;
+                //             case '!getp': 
+                //                 contentMessage = `!getpunishments ${nigga[1]}`
+                //                 break;
+                //             default:
+                //                 contentMessage = args.value
+                //                 break;
+                //         }
 
         
-                        proceed = false;
+                //         proceed = false;
 
-                        currChannel = channel.id;
+                //         currChannel = channel.id;
         
-                        BdApi.findModuleByProps('sendMessage').sendMessage(contentMessage.startsWith('!getpunishments') ? botActualDM : channelId, {content: contentMessage, tts: false, invalidEmojis: [], validNonShortcutEmojis: []}, undefined, {});
+                //         BdApi.findModuleByProps('sendMessage').sendMessage(contentMessage.startsWith('!getpunishments') ? botActualDM : contentMessage.startsWith('!unban') ? '1011089597171765288' : channelId, {content: contentMessage, tts: false, invalidEmojis: [], validNonShortcutEmojis: []}, undefined, {});
                         
-                        await new Promise((resolve, reject) => {
-                            let i = 0;
-                            let interval = setInterval(() => {
-                                if (i > 7500) {
-                                    clearInterval(interval);
-                                    recentBotMsg = `<@!${botId}> didn't respond in time.`;
-                                    return resolve();
-                                }
+                //         await new Promise((resolve, reject) => {
+                //             let i = 0;
+                //             let interval = setInterval(() => {
+                //                 if (i > 7500) {
+                //                     clearInterval(interval);
+                //                     recentBotMsg = `<@!${botId}> didn't respond in time.`;
+                //                     return resolve();
+                //                 }
         
-                                if (proceed === true) {
-                                    clearInterval(interval);
-                                    proceed = false;
-                                    return resolve();
-                                }
+                //                 if (proceed === true) {
+                //                     clearInterval(interval);
+                //                     proceed = false;
+                //                     return resolve();
+                //                 }
         
-                                i += 10;
-                            }, 10)
-                        })
+                //                 i += 10;
+                //             }, 10)
+                //         })
         
                         
-                        setTimeout(()=>{
-                            let newBotMessage = Object.assign(botMessage, {editedTimestamp: moment()})
-                            newBotMessage.flags = 64;
-                            newBotMessage.content = recentBotMsg;
-                            dirtyDispatch({type: "MESSAGE_UPDATE", message: newBotMessage})
-                        }, 50)
+                //         setTimeout(()=>{
+                //             let newBotMessage = Object.assign(botMessage, {editedTimestamp: moment()})
+                //             newBotMessage.flags = 64;
+                //             newBotMessage.content = recentBotMsg;
+                //             dirtyDispatch({type: "MESSAGE_UPDATE", message: newBotMessage})
+                //         }, 50)
                        
                      
-                    }
+                //     }
         
-                })
-                DiscordCommands.BUILT_IN_COMMANDS.push({
-                    __registerId: "bot2",
-                    applicationId: "betterdiscord",
-                    name: "/q",
-                    displayName: '/q',
-                    description: "asks for username",
-                    displayDescription: "asks for username",
-                    id: "bot-synapse3",
-                    type: 1,
-                    target: 1,
-                    predicate: () => true,
-                    options: [],
-                    execute: async ([args], {channel}) => {
+                // })
+                // DiscordCommands.push({
+                //     applicationId: "betterdiscord",
+                //     name: "/q",
+                //     displayName: '/q',
+                //     description: "asks for username",
+                //     displayDescription: "asks for username",
+                //     id: "bot-synapse3",
+                //     type: 1,
+                //     target: 1,
+                //     predicate: () => true,
+                //     options: [],
+                //     execute: async ([args], {channel}) => {
         
-                        let chnl = BdApi.findModuleByProps("getLastSelectedChannelId", "getChannelId").getChannelId();
+                //         let chnl = BdApi.findModuleByProps("getLastSelectedChannelId", "getChannelId").getChannelId();
                     
-                        BdApi.findModuleByProps('sendMessage').sendMessage(chnl, {content: "Please state your **Synapse X** username.", tts: false, invalidEmojis: [], validNonShortcutEmojis: []}, undefined, {});
+                //         BdApi.findModuleByProps('sendMessage').sendMessage(chnl, {content: "Please state your **Synapse X** username.", tts: false, invalidEmojis: [], validNonShortcutEmojis: []}, undefined, {});
                      
-                    }
+                //     }
         
-                })
-                DiscordCommands.BUILT_IN_COMMANDS.push({
-                    __registerId: "bot2",
-                    applicationId: "betterdiscord",
-                    name: "help",
-                    displayName: 'help',
-                    description: "all available commands",
-                    displayDescription: "all available commands",
-                    id: "bot-synapse3",
-                    type: 1,
-                    target: 1,
-                    predicate: () => true,
-                    options: [],
-                    execute: async ([args], {channel}) => {
+                // })
+                // DiscordCommands.push({
+                //     applicationId: "betterdiscord",
+                //     name: "help",
+                //     displayName: 'help',
+                //     description: "all available commands",
+                //     displayDescription: "all available commands",
+                //     id: "bot-synapse3",
+                //     type: 1,
+                //     target: 1,
+                //     predicate: () => true,
+                //     options: [],
+                //     execute: async ([args], {channel}) => {
         
-                        const receivedMessage = MessageCreators.createBotMessage({channelId: channel.id});    
-                        receivedMessage.author.username = 'robotic yorki';
-                        receivedMessage.author.discriminator = '0700';
-                        receivedMessage.author.id = '982751970173550612';
-                        receivedMessage.flags = 64;
-                        receivedMessage.author.avatar = '4f0025a913750458f163f96b99d58c3b';
+                //         const receivedMessage = MessageCreators.createBotMessage({channelId: channel.id});    
+                //         receivedMessage.author.username = 'robotic yorki';
+                //         receivedMessage.author.discriminator = '0700';
+                //         receivedMessage.author.id = '982751970173550612';
+                //         receivedMessage.flags = 64;
+                //         receivedMessage.author.avatar = '4f0025a913750458f163f96b99d58c3b';
         
         
-                        receivedMessage.content = `Here are the available commands for making your synapse staffing easeier:\n----------------------------------\n"/b [any synapse command]" - will send any synapse command to staff-bot and retrieve the bot message in the current channel\n\n Some examples:\n\n "/b !getinv" - will automatically copy the invite link\n"/b !verf [username]" - this command doesn't require the user ID anymore\n----------------------------------\n"/ss" - helpers can use this to automatically screenshot verification tokens and send them inside #invite-request\n----------------------------------\n"//q" - Ask for synapse username\n----------------------------------\nKey binds:\n\n"CTRL + B" - if the user's last message is their username (only their username in one single line) or you have selected their username on discord, it will automatically generate the auth command with their username.\n "CTRL + N" - will automatically generate the verify command with their username (CTRL + B has to be performed first for this command to work)` 
+                //         receivedMessage.content = `Here are the available commands for making your synapse staffing easeier:\n----------------------------------\n"/b [any synapse command]" - will send any synapse command to staff-bot and retrieve the bot message in the current channel\n\n Some examples:\n\n "/b !getinv" - will automatically copy the invite link\n"/b !verf [username]" - this command doesn't require the user ID anymore\n----------------------------------\n"/ss" - helpers can use this to automatically screenshot verification tokens and send them inside #invite-request\n----------------------------------\n"//q" - Ask for synapse username\n----------------------------------\nKey binds:\n\n"CTRL + B" - if the user's last message is their username (only their username in one single line) or you have selected their username on discord, it will automatically generate the auth command with their username.\n "CTRL + N" - will automatically generate the verify command with their username (CTRL + B has to be performed first for this command to work)` 
                      
-                        MessageActions.receiveMessage(channel.id, receivedMessage);
+                //         MessageActions.receiveMessage(channel.id, receivedMessage);
         
-                    }
+                //     }
         
-                })
+                // })
                 FluxDispatcher.subscribe('MESSAGE_CREATE', this.handleMessage);
-    
             }   
 
             async handleKeyDown(listener) {
                 if (listener.ctrlKey && listener.keyCode === 72) {
                     const target = listener.target.closest("[class^=message-]");
                     if (!target) return;
-                    const {ComponentDispatch} = BdApi.findModuleByProps("ComponentDispatch");
                     var span = document.createElement("span");
                     span.style.color = "white";
                     span.style.fontSize = "17px";
@@ -944,21 +1064,21 @@ module.exports = !global.ZeresPluginLibrary ? Dummy : (([Plugin, Api]) => {
                     let userDM = newChannel.getRecipientId()
                     if (window.getSelection().toString() == "") {
                         let message3 = _(getMessages(chnl).toArray()).reverse().find((message5) => {
-                            if (message5.author.id !== userid && message5.author.id !== "982751970173550612" && message5.author.id !== "983394662716952616") {
+                            if (message5.author.id !== userid && message5.author.id !== "1" && message5.author.id !== "983394662716952616") {
                                 return message5
                             }   
                         })
                         if (message3 !== undefined) {
                             obj[`${message3.author.id}`] = message3.content;
                             ComponentDispatch.dispatchToLastSubscribed("INSERT_TEXT", {
-                                plainText: `/b message:!auth ${message3.content}`
+                                plainText: `.b !auth ${message3.content}`
                             });
                         }
                     }
                     else {
                         obj[`${userDM}`] = window.getSelection().toString();
                         ComponentDispatch.dispatchToLastSubscribed("INSERT_TEXT", {
-                            plainText: `/b message:!auth ${window.getSelection().toString()}`
+                            plainText: `.b !auth ${window.getSelection().toString()}`
                         });
                     }
                    
@@ -971,28 +1091,31 @@ module.exports = !global.ZeresPluginLibrary ? Dummy : (([Plugin, Api]) => {
                     let actualMsg = obj[userDM];
                     if (actualMsg == undefined) return;
                     ComponentDispatch.dispatchToLastSubscribed("INSERT_TEXT", {
-                        plainText: `/b message:!verf ${actualMsg}`
+                        plainText: `.b !verf ${actualMsg}`
                     });
                     
                   
                 }
             }
+
+    
     
             async handleMessage({message}) {
                 let { getDMFromUserId } = BdApi.findModuleByProps("getDMFromUserId")
                 let channelName = BdApi.findModuleByProps('getChannel', 'hasChannel').getChannel(message.channel_id).name
                 let chnl = BdApi.findModuleByProps("getLastSelectedChannelId", "getChannelId").getChannelId();
                 let DMChannel = getDMFromUserId(message.author.id)
+                
                 if (message.author.id === botId) {
                     console.log(message);
         
-                    let { ack } = BdApi.findModuleByProps("ack")
+                    let ack = (target => BdApi.Webpack.getModule((m, e) => m.toString().includes("CHANNEL_ACK") && (target = e.exports)) && target)();
             
                     if (message.embeds.length < 1) {
                         if (message.content.indexOf('discord.gg') > -1) {
-                            clipboard.writeText(message.content)
+                            clipboard.copy(message.content)
                             recentBotMsg = `:white_check_mark: Copied invite link to your clipboard.`;
-                            ack(message.channel_id)
+                            ack.In(message.channel_id)
                             proceed = true;
                         }
                         return;
@@ -1008,7 +1131,7 @@ module.exports = !global.ZeresPluginLibrary ? Dummy : (([Plugin, Api]) => {
                     if (embed.description.indexOf('Successfully sent authentication email.') > -1) BdApi.findModuleByProps('sendMessage').sendMessage(currChannel, {content: "Please check your email and provide me with the **Verification Token** that I've **JUST** sent. ", tts: false, invalidEmojis: [], validNonShortcutEmojis: []}, undefined, {});
                     if (embed.description.indexOf(`<@!${userid}>`) > -1 && embed.description.indexOf('successfully verified') > -1) BdApi.findModuleByProps('sendMessage').sendMessage(currChannel, {content: "You have been successfully **Verified**.", tts: false, invalidEmojis: [], validNonShortcutEmojis: []}, undefined, {});
         
-                    ack(message.channel_id)
+                    ack.In(message.channel_id)
             
                     recentBotMsg = `${embed.description}\n\nhttps://discord.com/channels/${message.guild_id ? message.guild_id : '@me'}/${message.channel_id}/${message.id}`;
             
@@ -1028,28 +1151,30 @@ module.exports = !global.ZeresPluginLibrary ? Dummy : (([Plugin, Api]) => {
         
                     if (match === null) return;
         
-                    try {
-                        const receivedMessage = MessageCreators.createBotMessage({channelId: message.channel_id});    
+                    // try {
+
+                        
+                    //     const receivedMessage = MessageCreators.createBotMessage({channelId: message.channel_id});    
         
-                        receivedMessage.author.username = 'robotic yorki';
-                        receivedMessage.author.discriminator = '0700';
-                        receivedMessage.author.id = '982751970173550612';
-                        receivedMessage.flags = 128 + 64; 
-                        receivedMessage.author.avatar = '4f0025a913750458f163f96b99d58c3b';
+                    //     receivedMessage.author.username = 'robotic yorki';
+                    //     receivedMessage.author.discriminator = '0700';
+                    //     receivedMessage.author.id = '982751970173550612';
+                    //     receivedMessage.flags = 128 + 64; 
+                    //     receivedMessage.author.avatar = '4f0025a913750458f163f96b99d58c3b';
                             
-                        await MessageActions.receiveMessage(message.channel_id, receivedMessage);
-                    }
-                    catch {
-                        console.log('error but for some reason it still works after this error? PLEASE HELP I AM NOT SANE I DO NOT KNOW WHY THIS IS HAPPENING')
-                    }
+                    //     await MessageActions.receiveMessage(message.channel_id, receivedMessage);
+                    // }
+                    // catch {
+                    //     console.log('error but for some reason it still works after this error? PLEASE HELP I AM NOT SANE I DO NOT KNOW WHY THIS IS HAPPENING')
+                    // }
         
                     
         
-                    let botMessage = _(getMessages(message.channel_id).toArray()).reverse().find((message3)=>{
-                        if(message3.author.id === "982751970173550612"){
-                            return message3
-                        }
-                    })
+                    // let botMessage = _(getMessages(message.channel_id).toArray()).reverse().find((message3)=>{
+                    //     if(message3.author.id === "982751970173550612"){
+                    //         return message3
+                    //     }
+                    // })
         
                     let botDms = getDMFromUserId(botId)
                     
@@ -1073,26 +1198,27 @@ module.exports = !global.ZeresPluginLibrary ? Dummy : (([Plugin, Api]) => {
                     }
         
         
-                        
-                    setTimeout(()=>{
-                        let newBotMessage = Object.assign(botMessage, {editedTimestamp: moment()})
-                        newBotMessage.flags = 64;
-                        newBotMessage.content = recentBotMsg3;
-                        dirtyDispatch({type: "MESSAGE_UPDATE", message: newBotMessage})
-                    }, 100)
+                    MessageCreators.sendBotMessage(message.channel_id, recentBotMsg3)    
+                    // setTimeout(()=>{
+                    //     let newBotMessage = Object.assign(botMessage, {editedTimestamp: moment()})
+                    //     newBotMessage.flags = 64;
+                    //     newBotMessage.content = recentBotMsg3;
+                    //     dirtyDispatch({type: "MESSAGE_UPDATE", message: newBotMessage})
+                    // }, 100)
                 }
             }
 
             
     
             onStop() {
+                observer.disconnect();
                 document.removeEventListener('keydown', this.handleKeyDown);
                 FluxDispatcher.unsubscribe('MESSAGE_CREATE', this.handleMessage);
-                let index = DiscordCommands.BUILT_IN_COMMANDS.findIndex((cmd => cmd.__registerId == "bot2"));
-                while (index > -1) {
-                    DiscordCommands.BUILT_IN_COMMANDS.splice(index, 1);
-                    index = DiscordCommands.BUILT_IN_COMMANDS.findIndex((cmd => cmd.__registerId == "bot2"));
-                }
+                // let index = DiscordCommands.findIndex((cmd => cmd.id == "bot2"));
+                // while (index > -1) {
+                //     DiscordCommands.splice(index, 1);
+                //     index = DiscordCommands.findIndex((cmd => cmd.id == "bot2"));
+                // }
             }
     
         }
