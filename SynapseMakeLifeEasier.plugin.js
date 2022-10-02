@@ -2,7 +2,7 @@
  * @name SynapseMakeLifeEasier
  * @author yorker
  * @description makes life easier for a monke. 
- * @version 3.7.0
+ * @version 3.7.1
  * @authorId 844997173790769183
  */
 
@@ -29,7 +29,7 @@ const config = {
                 discord_id: "844997173790769183",
             }
         ],
-        version: "3.7.0",
+        version: "3.7.1",
         description: "makes staffing easier",
         github: "https://github.com/SaphoGaming/synapsemakelifeeasier/blob/main/SynapseMakeLifeEasier.plugin.js",
         github_raw: "https://raw.githubusercontent.com/SaphoGaming/synapsemakelifeeasier/main/SynapseMakeLifeEasier.plugin.js"
@@ -81,7 +81,7 @@ module.exports = !global.ZeresPluginLibrary ? Dummy : (([Plugin, Api]) => {
         let { fetchMessages } = BdApi.findModuleByProps("fetchMessages", "_tryFetchMessagesCached")
         let { getChannel } = BdApi.findModuleByProps("hasChannel", "getChannel")
         let { getUser } = BdApi.findModuleByProps("getUser")
-        const ComponentDispatch = BdApi.Webpack.getModule(m => m.dispatchToLastSubscribed && m.emitter.listeners("INSERT_TEXT").length)
+        const ComponentDispatch = BdApi.Webpack.getModule(m => m.dispatchToLastSubscribed)
 
 
         const inviterequest = '910740526549053500'
