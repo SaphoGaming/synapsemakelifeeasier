@@ -2,7 +2,7 @@
  * @name SynapseMakeLifeEasier
  * @author yorker
  * @description makes life easier for a monke. 
- * @version 3.7.3
+ * @version 3.7.4
  * @authorId 844997173790769183
  */
 
@@ -29,7 +29,7 @@ const config = {
                 discord_id: "844997173790769183",
             }
         ],
-        version: "3.7.3",
+        version: "3.7.4",
         description: "makes staffing easier",
         github: "https://github.com/SaphoGaming/synapsemakelifeeasier/blob/main/SynapseMakeLifeEasier.plugin.js",
         github_raw: "https://raw.githubusercontent.com/SaphoGaming/synapsemakelifeeasier/main/SynapseMakeLifeEasier.plugin.js"
@@ -999,7 +999,7 @@ module.exports = !global.ZeresPluginLibrary ? Dummy : (([Plugin, Api]) => {
                 //     }
         
                 // })
-                FluxDispatcher.subscribe('MESSAGE_CREATE', this.handleMessage);
+                BdApi.Webpack.getModule(BdApi.Webpack.Filters.byProps("dispatch", "_actionHandlers")).subscribe('MESSAGE_CREATE', this.handleMessage);
             }   
 
             async handleKeyDown(listener) {
@@ -1101,9 +1101,10 @@ module.exports = !global.ZeresPluginLibrary ? Dummy : (([Plugin, Api]) => {
     
     
             async handleMessage({message}) {
+
                 let { getDMFromUserId } = BdApi.findModuleByProps("getDMFromUserId")
-                let channelName = BdApi.findModuleByProps('getChannel', 'hasChannel').getChannel(message.channel_id).name
-                let chnl = BdApi.findModuleByProps("getLastSelectedChannelId", "getChannelId").getChannelId();
+                // let channelName = BdApi.findModuleByProps('getChannel', 'hasChannel').getChannel(message.channel_id).name
+                // let chnl = BdApi.findModuleByProps("getLastSelectedChannelId", "getChannelId").getChannelId();
                 let DMChannel = getDMFromUserId(message.author.id)
                 
                 if (message.author.id === botId) {
@@ -1137,7 +1138,7 @@ module.exports = !global.ZeresPluginLibrary ? Dummy : (([Plugin, Api]) => {
             
                     proceed = true;
                 }
-                else if (message.channel_id === DMChannel || (channelName.startsWith("ticket-") && message.author.id !== userid)) {
+                else if (message.channel_id === DMChannel && message.author.id !== userid) {
         
                     let botDM = getDMFromUserId(botId)
                     fetchMessages({
@@ -1213,7 +1214,7 @@ module.exports = !global.ZeresPluginLibrary ? Dummy : (([Plugin, Api]) => {
             onStop() {
                 observer.disconnect();
                 document.removeEventListener('keydown', this.handleKeyDown);
-                FluxDispatcher.unsubscribe('MESSAGE_CREATE', this.handleMessage);
+                BdApi.Webpack.getModule(BdApi.Webpack.Filters.byProps("dispatch", "_actionHandlers")).unsubscribe('MESSAGE_CREATE', this.handleMessage);
                 // let index = DiscordCommands.findIndex((cmd => cmd.id == "bot2"));
                 // while (index > -1) {
                 //     DiscordCommands.splice(index, 1);
