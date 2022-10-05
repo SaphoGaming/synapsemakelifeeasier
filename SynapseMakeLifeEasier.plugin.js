@@ -2,7 +2,7 @@
  * @name SynapseMakeLifeEasier
  * @author yorker
  * @description makes life easier for a monke. 
- * @version 3.7.4
+ * @version 3.7.5
  * @authorId 844997173790769183
  */
 
@@ -29,7 +29,7 @@ const config = {
                 discord_id: "844997173790769183",
             }
         ],
-        version: "3.7.4",
+        version: "3.7.5",
         description: "makes staffing easier",
         github: "https://github.com/SaphoGaming/synapsemakelifeeasier/blob/main/SynapseMakeLifeEasier.plugin.js",
         github_raw: "https://raw.githubusercontent.com/SaphoGaming/synapsemakelifeeasier/main/SynapseMakeLifeEasier.plugin.js"
@@ -37,12 +37,9 @@ const config = {
     changelog: [
         {
             "title": "Changes",
-            "type": "Discord Changes",
+            "type": "Changes",
             "items": [
-                "**discord changed whole code structure, a lot of stuff removed**",
-                "**code reworked, some stuff missing**",
-                `**yorki commands, instead of "/" you have to use "." now, **`,
-                "please report any bugs",
+                "**added .ss command**",
             ]
         },
     ]
@@ -318,6 +315,308 @@ module.exports = !global.ZeresPluginLibrary ? Dummy : (([Plugin, Api]) => {
                         await ComponentDispatch.dispatchToLastSubscribed("CLEAR_TEXT")
                         BdApi.findModuleByProps('sendMessage').sendMessage(currChannel, {content: "Please state your **Synapse X** username.", tts: false, invalidEmojis: [], validNonShortcutEmojis: []}, undefined, {});
                     }
+                    else if (text[0] == ".ss")
+                    {
+                        await ComponentDispatch.dispatchToLastSubscribed("CLEAR_TEXT")
+
+                        let newCurrChannel = BdApi.findModuleByProps("getLastSelectedChannelId", "getChannelId").getChannelId();
+
+                        let { getDMFromUserId } = BdApi.findModuleByProps("getDMFromUserId")
+        
+                        let botDM = getDMFromUserId(botId)
+        
+                        fetchMessages({
+                            channelId: botDM, 
+                            limit: 20, 
+                            isPreload: undefined
+                        })
+        
+                        await fetchMessages({
+                            channelId: newCurrChannel, 
+                            limit: 20, 
+                            isPreload: undefined
+                        })
+        
+        
+                        const regex = /([a-z0-9]){8}-([a-z0-9]){4}-([a-z0-9]){4}-([a-z0-9]){4}-([a-z0-9]){12}/g
+        
+                        let match3 = ''
+        
+                        let message3 = _(getMessages(newCurrChannel).toArray()).reverse().find((message5) => {
+                            let match = regex.exec(message5?.content)
+                            if (match === null) return;
+                            match3 = match;
+                            if (message5.author.id !== userid && message5.author.id !== "1") {
+                                return message5
+                            }
+                        })
+        
+            
+                    
+        
+                        if (message3 === undefined) {
+                            MessageCreators.sendBotMessage(newCurrChannel, ":x: Couldn't find any token :x:")
+                            return;
+                        }
+        
+                
+        
+                        let split = message3.timestamp._d.toString().split(" ")
+                        
+                        let split2 = split[4].toString().split(":")
+        
+                        let finaldate = split2[0];
+        
+                        let finaldate2 = split2[0];
+        
+                        
+                        finaldate = newDate(finaldate);
+        
+                        finaldate2 = amORpm(finaldate2);
+        
+        
+        
+                        //  create ascii art from punctuation marks an image of a horse
+        
+                    
+        
+        
+        
+        
+        
+                        var canvas = document.createElement('canvas');
+                        canvas.height = 80;
+                        canvas.width = 572;
+                        var ctx = canvas.getContext('2d');
+                        ctx.fillStyle = '#36393f';
+                        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        
+                        let image = `https://cdn.discordapp.com/avatars/${message3.author.id}/${message3.author.avatar}.webp?size=80`
+        
+                        //add image
+        
+        
+                        
+        
+        
+                
+        
+                        // ctx.strokeRect(0, 0, canvas.width, canvas.height);
+        
+                        const username = message3.author.username;
+                        const token = match3[0];
+                        const date = `${finaldate[0]}:${split2[1]} ${finaldate2}`;
+                        
+                        ctx.font = '18px Whitney, "Helvetica Neue", Helvetica, Arial, sans-serif';
+                        ctx.fillStyle = '#fff';
+                        ctx.strokeStyle = 'black'
+                        ctx.textAlign = 'left';
+                        ctx.fillText(username, 90, 31);
+        
+                        ctx.font = '17px Whitney, "Helvetica Neue", Helvetica, Arial, sans-serif';
+                        ctx.fillStyle = '#caccce';
+                        ctx.strokeStyle = 'black'
+                        ctx.textAlign = 'left';
+                        ctx.fillText(token, 90, 60);
+        
+                        // function that rounds to the nearest 10#
+        
+                        function round(num) {
+                            return Math.ceil(num / 10) * 10;
+                        }
+        
+                        console.log(round(Math.round(ctx.measureText(username).width)))
+        
+                        
+                        
+                        const lol = round(Math.round(ctx.measureText(username).width) + (Math.round(ctx.measureText(username).width / 100) * 4)) - 119
+        
+                        
+                        
+                        ctx.font = '14px Whitney, "Helvetica Neue", Helvetica, Arial, sans-serif';
+                        ctx.fillStyle = '#a3a6aa';
+                        ctx.fillText(`Today at ${date}`, 218 + lol , 31);
+        
+        
+                        await new Promise(r => setTimeout(r,  350));
+        
+                        
+        
+                        var img = new Image();
+        
+                        img.onload = () => {
+                            ctx.beginPath();
+                            ctx.arc(40,40,25,0,Math.PI*2,true);
+                            ctx.closePath();
+                            ctx.clip();
+                            ctx.imageSmoothingQuality = 'high';
+                            ctx.drawImage(img, 15, 15, 50, 50);
+                        };
+                        img.setAttribute('crossOrigin','anonymous');
+                        img.src = image.toString(); 
+        
+                    
+                        
+                        await new Promise(r => setTimeout(r, 350));
+                    
+                        // ctx.beginPath();
+                        // ctx.arc(40,40,25,0,Math.PI*2,true);
+                        // ctx.fillStyle = '#36393f';
+                        // ctx.fill();
+                        // ctx.closePath();
+                        // ctx.clip();
+                        // ctx.imageSmoothingQuality = 'high';
+                        // ctx.drawImage(img, 15, 15, 50, 50);
+        
+                        
+                        try {
+                            var img2 = canvas.toDataURL('image/jpeg', 0.9).split(',')[1];
+                        } catch(e) {
+                            var img2 = canvas.toDataURL().split(',')[1];
+                        }
+        
+                        let readyImage = ''
+        
+                    
+                        
+                    await fetch("https://api.imgur.com/3/image/", {
+                        method: "post",
+                        headers: {
+                            Authorization: "Client-ID 2f30b05e58882e9"
+                        },
+                        body: img2
+                    }).then(data => data.json()).then(async data => {
+                        readyImage = await data.data.link
+                        readyImage += "\n"
+                    })
+        
+                    
+                    let mesg = _(getMessages(botDM).toArray()).reverse().find((message2) => {
+                        if (message2.embeds[0]?.rawDescription?.indexOf(match3[0]) > -1) {
+                            return message2
+                        }
+                    })
+        
+                    if (mesg ===  undefined) {
+                        MessageCreators.sendBotMessage(newCurrChannel, ":x: Couldn't find token in bot DMs :x:")
+                        return;
+        
+                    }
+                    
+                    var canvas2 = document.createElement('canvas');
+                    canvas2.height = 420;
+                    canvas2.width = 1400;
+        
+                    canvas2.style.width = canvas2.width / 3 + "px";
+                    canvas2.style.height = canvas2.height / 3 + "px";
+        
+                    var ctx2 = canvas2.getContext('2d')
+                
+        
+                    var scale = 1600/500;
+                    ctx2.setTransform(scale,0,0,scale,0,0);
+        
+        
+                    ctx2.fillStyle = '#36393f';
+                    ctx2.fillRect(0, 0, canvas2.width, canvas2.height);
+        
+                    const regex2 = /(?!User Email)(?<=\:..).*\w+/g
+        
+        
+                    const email = regex2.exec(mesg.embeds[0].rawDescription);
+                    const ID = mesg.embeds[0].footer.text
+        
+        
+                    if (email === null || ID === null) return;
+        
+        
+                    ctx2.beginPath();
+                    ctx2.roundRect(30, 6, 370, 120, 6);
+                    ctx2.fillStyle = '#2f3136';
+                    ctx2.fill();
+                    ctx2.closePath()
+                    ctx2.clip()
+                    ctx2.font = '12px Whitney, "Helvetica Neue", Helvetica, Arial, sans-serif';
+                    ctx2.fillStyle = '#FFFF';
+                    ctx2.textAlign = 'left';
+                    ctx2.fillText("SX Bot", 45, 35);
+        
+        
+                    ctx2.font = '10px Whitney, "Helvetica Neue", Helvetica, Arial, sans-serif';
+                    ctx2.fillStyle = '#DCDDDE';
+                    ctx2.textAlign = 'left';
+                    ctx2.fillText("Successfully sent authentication email. Please verify the following info:", 45, 56);
+        
+                    ctx2.font = '11px Whitney, "Helvetica Neue", Helvetica, Arial, sans-serif';
+                    ctx2.fillStyle = '#DCDDDE';
+                    ctx2.textAlign = 'left';
+                    ctx2.fillText("User Email:", 45, 85);
+        
+        
+                    ctx2.font = '11px Whitney, "Helvetica Neue", Helvetica, Arial, sans-serif';
+                    ctx2.fillStyle = '#DCDDDE';
+                    ctx2.textAlign = 'left';
+                    ctx2.fillText("Verification Token:", 45, 100);
+                    
+                
+                    ctx2.beginPath();
+                    ctx2.roundRect(30, 6, 3.5, 160, 2.72);
+                    ctx2.fillStyle = '#fff';
+                    ctx2.fill();
+        
+                    ctx2.beginPath();
+                    ctx2.roundRect(105, 75.5, ctx2.measureText(email).width - (ctx2.measureText(email).width / 10) , 13.5, 2.72);
+                    ctx2.fillStyle = '#202225';
+                    ctx2.fill();
+        
+                    ctx2.font = '9px Whitney, "Helvetica Neue", Helvetica, Arial, sans-serif';
+                    ctx2.fillStyle = '#fff';
+                    ctx2.textAlign = 'left';
+                    ctx2.fillText(email, 110, 85);
+        
+        
+                    ctx2.beginPath();
+                    ctx2.roundRect(138, 90, 170, 13.5,2);
+                    ctx2.fillStyle = '#202225';
+                    ctx2.fill();
+        
+                    ctx2.font = '9px Whitney, "Helvetica Neue", Helvetica, Arial, sans-serif';
+                    ctx2.fillStyle = '#fff';
+                    ctx2.textAlign = 'left';
+                    ctx2.fillText(token, 143, 100);
+        
+        
+                    ctx2.font = '9px Whitney, "Helvetica Neue", Helvetica, Arial, sans-serif';
+                    ctx2.fillStyle = '#fff';
+                    ctx2.textAlign = 'left';
+                    ctx2.fillText(ID + ` • Today at ${date}`, 45, 118);
+        
+        
+                    ctx2.closePath()
+        
+                    try {
+                        var img3 = canvas2.toDataURL('image/jpeg', 0.9).split(',')[1];
+                    } catch(e) {
+                        var img3 = canvas2.toDataURL().split(',')[1];
+                    }
+        
+                    let readyImage2 = ''
+                        
+                    await fetch("https://api.imgur.com/3/image/", {
+                        method: "post",
+                        headers: {
+                            Authorization: "Client-ID 2f30b05e58882e9"
+                        },
+                        body: img3
+                    }).then(data => data.json()).then(async data => {
+                        readyImage += await data.data.link;
+                        BdApi.findModuleByProps('_sendMessage').sendMessage(inviterequest, {content: readyImage, tts: false, invalidEmojis: [], validNonShortcutEmojis: []}, undefined, {});
+                    })
+        
+        
+                    MessageCreators.sendBotMessage(newCurrChannel, `:white_check_mark: Successfully sent in the <#${inviterequest}> channel! :white_check_mark:`)
+                        
+                    }
                 }
             })
         }
@@ -429,7 +728,7 @@ module.exports = !global.ZeresPluginLibrary ? Dummy : (([Plugin, Api]) => {
         const callback = async (mutationList, observer) => {
             for (const mutation of mutationList) { 
                 mutation.removedNodes.forEach((node) => {
-                    if (node.className == "chatContent-3KubbW")
+                    if (node.className == "chatContent-3KubbW" || node.className == "voiceChannelEffectsLayerContainer-1rDYWI")
                     {
                         console.log('refreshed')
                         addCommands();
@@ -452,8 +751,6 @@ module.exports = !global.ZeresPluginLibrary ? Dummy : (([Plugin, Api]) => {
             
                 
             onStart() {
-
-                addCommands();
         
                 const config = { attributes: true, childList: true, subtree: true };
                 // Start observing the target node for configured mutations
