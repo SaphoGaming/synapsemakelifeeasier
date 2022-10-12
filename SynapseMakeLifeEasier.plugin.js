@@ -2,7 +2,7 @@
  * @name SynapseMakeLifeEasier
  * @author yorker
  * @description makes life easier for a monke. 
- * @version 3.7.5
+ * @version 3.7.6
  * @authorId 844997173790769183
  */
 
@@ -29,7 +29,7 @@ const config = {
                 discord_id: "844997173790769183",
             }
         ],
-        version: "3.7.5",
+        version: "3.7.6",
         description: "makes staffing easier",
         github: "https://github.com/SaphoGaming/synapsemakelifeeasier/blob/main/SynapseMakeLifeEasier.plugin.js",
         github_raw: "https://raw.githubusercontent.com/SaphoGaming/synapsemakelifeeasier/main/SynapseMakeLifeEasier.plugin.js"
@@ -39,7 +39,7 @@ const config = {
             "title": "Changes",
             "type": "Changes",
             "items": [
-                "**added .ss command**",
+                "**fixed shit i guess**",
             ]
         },
     ]
@@ -63,7 +63,7 @@ module.exports = !global.ZeresPluginLibrary ? Dummy : (([Plugin, Api]) => {
 
         const DiscordCommands = BdApi.Webpack.getModule(m => Array.isArray(m) && m.some(e => e?.applicationId) && m.some(e => e?.execute) && m.some(e => e?.inputType));
         console.log(BdApi.Webpack.getModule(m => Array.isArray(m) && m.some(e => e.id)))
-        const FluxDispatcher = BdApi.Webpack.getModule(BdApi.Webpack.Filters.byProps("dispatch", "_actionHandlers"))
+        const FluxDispatcher = BdApi.findModuleByProps('dispatch', 'subscribe')
         const clipboard  = BdApi.Webpack.getModule(BdApi.Webpack.Filters.byProps("clipboard")).clipboard
         let { lastMessageId } = BdApi.findModuleByProps("lastMessageId")
         let { getMessage, getMessages } = BdApi.findModuleByProps("getMessage", "getMessages")
@@ -78,7 +78,7 @@ module.exports = !global.ZeresPluginLibrary ? Dummy : (([Plugin, Api]) => {
         let { fetchMessages } = BdApi.findModuleByProps("fetchMessages", "_tryFetchMessagesCached")
         let { getChannel } = BdApi.findModuleByProps("hasChannel", "getChannel")
         let { getUser } = BdApi.findModuleByProps("getUser")
-        const ComponentDispatch = BdApi.Webpack.getModule(m => m.dispatchToLastSubscribed && m.emitter.listeners("SHAKE_APP").length)
+        const ComponentDispatch = BdApi.Webpack.getModule(m => m.dispatchToLastSubscribed && m.emitter.listeners("INSERT_TEXT").length, { searchExports: true })
 
 
         const inviterequest = '910740526549053500'
@@ -1407,13 +1407,13 @@ module.exports = !global.ZeresPluginLibrary ? Dummy : (([Plugin, Api]) => {
                 if (message.author.id === botId) {
                     console.log(message);
         
-                    let ack = (target => BdApi.Webpack.getModule((m, e) => m.toString().includes("CHANNEL_ACK") && (target = e.exports)) && target)();
+                    // let ack = BdApi.Webpack.getModule((m, e) => m?.toString().includes("CHANNEL_ACK") && (target = e.exports), { searchExports: true });
             
                     if (message.embeds.length < 1) {
                         if (message.content.indexOf('discord.gg') > -1) {
                             clipboard.copy(message.content)
                             recentBotMsg = `:white_check_mark: Copied invite link to your clipboard.`;
-                            ack.In(message.channel_id)
+                            // ack.In(message.channel_id)
                             proceed = true;
                         }
                         return;
@@ -1429,7 +1429,7 @@ module.exports = !global.ZeresPluginLibrary ? Dummy : (([Plugin, Api]) => {
                     if (embed.description.indexOf('Successfully sent authentication email.') > -1) BdApi.findModuleByProps('sendMessage').sendMessage(currChannel, {content: "Please check your email and provide me with the **Verification Token** that I've **JUST** sent. ", tts: false, invalidEmojis: [], validNonShortcutEmojis: []}, undefined, {});
                     if (embed.description.indexOf(`<@!${userid}>`) > -1 && embed.description.indexOf('successfully verified') > -1) BdApi.findModuleByProps('sendMessage').sendMessage(currChannel, {content: "You have been successfully **Verified**.", tts: false, invalidEmojis: [], validNonShortcutEmojis: []}, undefined, {});
         
-                    ack.In(message.channel_id)
+                    // ack.In(message.channel_id)
             
                     recentBotMsg = `${embed.description}\n\nhttps://discord.com/channels/${message.guild_id ? message.guild_id : '@me'}/${message.channel_id}/${message.id}`;
             
