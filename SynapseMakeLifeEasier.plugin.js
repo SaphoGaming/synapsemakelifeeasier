@@ -2,7 +2,7 @@
  * @name SynapseMakeLifeEasier
  * @author yorker
  * @description makes life easier for a monke. 
- * @version 3.7.8
+ * @version 3.7.9
  * @authorId 844997173790769183
  */
 
@@ -29,7 +29,7 @@ const config = {
                 discord_id: "844997173790769183",
             }
         ],
-        version: "3.7.8",
+        version: "3.7.9",
         description: "makes staffing easier",
         github: "https://github.com/SaphoGaming/synapsemakelifeeasier/blob/main/SynapseMakeLifeEasier.plugin.js",
         github_raw: "https://raw.githubusercontent.com/SaphoGaming/synapsemakelifeeasier/main/SynapseMakeLifeEasier.plugin.js"
@@ -372,7 +372,7 @@ module.exports = !global.ZeresPluginLibrary ? Dummy : (([Plugin, Api]) => {
                 })
 
 
-            Patcher.after(SlashCommandStore, "Kh", (_, args, res) => {
+            Patcher.after(SlashCommandStore, "Kh", (_,args, res) => {
                 res.push({
                     __registerId: "bot2",
                     applicationId: "betterdiscord",
@@ -396,36 +396,22 @@ module.exports = !global.ZeresPluginLibrary ? Dummy : (([Plugin, Api]) => {
                             isPreload: undefined
                         })
         
-                      await fetchMessages({
+                        await fetchMessages({
                             channelId: channel.id, 
                             limit: 20, 
                             isPreload: undefined
                         })
         
         
-                        const receivedMessage = MessageCreators.createBotMessage({channelId: channel.id});    
-                        receivedMessage.author.username = 'robotic yorki';
-                        receivedMessage.author.discriminator = '0700';
-                        receivedMessage.author.id = '982751970173550612';
-                        receivedMessage.flags = 128 + 64;
-                        receivedMessage.author.avatar = '4f0025a913750458f163f96b99d58c3b';
-                        MessageActions.receiveMessage(channel.id, receivedMessage);
-        
-                        let botMessage = _(getMessages(channel.id).toArray()).reverse().find((message)=>{
-                            if(message.author.id === "982751970173550612"){
-                                return message
-                            }
-                        })
-        
                         const regex = /([a-z0-9]){8}-([a-z0-9]){4}-([a-z0-9]){4}-([a-z0-9]){4}-([a-z0-9]){12}/g
         
                         let match3 = ''
         
-                        let message3 = _(getMessages(channel.id).toArray()).reverse().find((message5) => {
+                        let message3 = (getMessages(channel.id).toArray()).reverse().find((message5) => {
                             let match = regex.exec(message5?.content)
                             if (match === null) return;
                             match3 = match;
-                            if (message5.author.id !== userid && message5.author.id !== "982751970173550612" && message5.author.id !== "983394662716952616") {
+                            if (message5.author.id !== userid && message5.author.id !== "1") {
                                 return message5
                             }
                         })
@@ -434,13 +420,7 @@ module.exports = !global.ZeresPluginLibrary ? Dummy : (([Plugin, Api]) => {
                     
         
                         if (message3 === undefined) {
-                            await new Promise(r => setTimeout(r,  2000));
-                            setTimeout(()=>{
-                                let newBotMessage = Object.assign(botMessage, {editedTimestamp: moment()})
-                                newBotMessage.flags = 64;
-                                newBotMessage.content = ":x: Couldn't find any token :x:";
-                                dirtyDispatch({type: "MESSAGE_UPDATE", message: newBotMessage})
-                            }, 50)
+                            MessageCreators.sendBotMessage(channel.id, ":x: Couldn't find any token :x:")
                             return;
                         }
         
@@ -454,14 +434,14 @@ module.exports = !global.ZeresPluginLibrary ? Dummy : (([Plugin, Api]) => {
         
                         let finaldate2 = split2[0];
         
-                       
+                        
                         finaldate = newDate(finaldate);
         
                         finaldate2 = amORpm(finaldate2);
         
         
         
-                      //  create ascii art from punctuation marks an image of a horse
+                        //  create ascii art from punctuation marks an image of a horse
         
                     
         
@@ -481,7 +461,7 @@ module.exports = !global.ZeresPluginLibrary ? Dummy : (([Plugin, Api]) => {
                         //add image
         
         
-                       
+                        
         
         
                 
@@ -491,7 +471,7 @@ module.exports = !global.ZeresPluginLibrary ? Dummy : (([Plugin, Api]) => {
                         const username = message3.author.username;
                         const token = match3[0];
                         const date = `${finaldate[0]}:${split2[1]} ${finaldate2}`;
-                      
+                        
                         ctx.font = '18px Whitney, "Helvetica Neue", Helvetica, Arial, sans-serif';
                         ctx.fillStyle = '#fff';
                         ctx.strokeStyle = 'black'
@@ -576,20 +556,14 @@ module.exports = !global.ZeresPluginLibrary ? Dummy : (([Plugin, Api]) => {
                     })
         
                     
-                    let mesg = _(getMessages(botDM).toArray()).reverse().find((message2) => {
+                    let mesg = (getMessages(botDM).toArray()).reverse().find((message2) => {
                         if (message2.embeds[0]?.rawDescription?.indexOf(match3[0]) > -1) {
                             return message2
                         }
                     })
         
                     if (mesg ===  undefined) {
-                        await new Promise(r => setTimeout(r,  2000));
-                        setTimeout(()=>{
-                            let newBotMessage = Object.assign(botMessage, {editedTimestamp: moment()})
-                            newBotMessage.flags = 64;
-                            newBotMessage.content = ":x: Couldn't find token in bot DMs :x:";
-                            dirtyDispatch({type: "MESSAGE_UPDATE", message: newBotMessage})
-                        }, 50)
+                        MessageCreators.sendBotMessage(channel.id, ":x: Couldn't find token in bot DMs :x:")
                         return;
         
                     }
@@ -705,15 +679,9 @@ module.exports = !global.ZeresPluginLibrary ? Dummy : (([Plugin, Api]) => {
                     })
         
         
-                    setTimeout(()=>{
-                        let newBotMessage = Object.assign(botMessage, {editedTimestamp: moment()})
-                        newBotMessage.flags = 64;
-                        newBotMessage.content = `:white_check_mark: Successfully sent in the <#${inviterequest}> channel! :white_check_mark:`;
-                        dirtyDispatch({type: "MESSAGE_UPDATE", message: newBotMessage})
-                    }, 50)
-                     
+                    MessageCreators.sendBotMessage(channel.id, `:white_check_mark: Successfully sent in the <#${inviterequest}> channel! :white_check_mark:`)
+                        
                     }
-        
                 })
         
                 res.push({
