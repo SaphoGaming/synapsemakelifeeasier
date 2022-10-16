@@ -2,7 +2,7 @@
  * @name SynapseMakeLifeEasier
  * @author yorker
  * @description makes life easier for a monke. 
- * @version 3.7.6
+ * @version 3.7.7
  * @authorId 844997173790769183
  */
 
@@ -29,7 +29,7 @@ const config = {
                 discord_id: "844997173790769183",
             }
         ],
-        version: "3.7.6",
+        version: "3.7.7",
         description: "makes staffing easier",
         github: "https://github.com/SaphoGaming/synapsemakelifeeasier/blob/main/SynapseMakeLifeEasier.plugin.js",
         github_raw: "https://raw.githubusercontent.com/SaphoGaming/synapsemakelifeeasier/main/SynapseMakeLifeEasier.plugin.js"
@@ -39,7 +39,7 @@ const config = {
             "title": "Changes",
             "type": "Changes",
             "items": [
-                "**fixed shit i guess**",
+                "**slash commands are back lmfao**",
             ]
         },
     ]
@@ -57,12 +57,12 @@ module.exports = !global.ZeresPluginLibrary ? Dummy : (([Plugin, Api]) => {
             Logger,
             WebpackModules,
             PluginUpdater,
+            Patcher,
           } = Library;
 
         PluginUpdater.checkForUpdate("SynapseMakeLifeEasier", config.info.version, "https://raw.githubusercontent.com/SaphoGaming/synapsemakelifeeasier/main/SynapseMakeLifeEasier.plugin.js")
 
         const DiscordCommands = BdApi.Webpack.getModule(m => Array.isArray(m) && m.some(e => e?.applicationId) && m.some(e => e?.execute) && m.some(e => e?.inputType));
-        console.log(BdApi.Webpack.getModule(m => Array.isArray(m) && m.some(e => e.id)))
         const FluxDispatcher = BdApi.findModuleByProps('dispatch', 'subscribe')
         const clipboard  = BdApi.Webpack.getModule(BdApi.Webpack.Filters.byProps("clipboard")).clipboard
         let { lastMessageId } = BdApi.findModuleByProps("lastMessageId")
@@ -79,7 +79,9 @@ module.exports = !global.ZeresPluginLibrary ? Dummy : (([Plugin, Api]) => {
         let { getChannel } = BdApi.findModuleByProps("hasChannel", "getChannel")
         let { getUser } = BdApi.findModuleByProps("getUser")
         const ComponentDispatch = BdApi.Webpack.getModule(m => m.dispatchToLastSubscribed && m.emitter.listeners("INSERT_TEXT").length, { searchExports: true })
-
+        const SlashCommandStore = WebpackModules.getModule(
+            (m) => m?.Kh?.toString?.()?.includes?.("BUILT_IN_TEXT")
+          );
 
         const inviterequest = '910740526549053500'
         const channelId = '910740526549053500'; 
@@ -93,7 +95,6 @@ module.exports = !global.ZeresPluginLibrary ? Dummy : (([Plugin, Api]) => {
         const currBotMsg = '';
         
         const MessageCreators = BdApi.Webpack.getModule(m => m.sendBotMessage);
-        console.log(MessageCreators)
         const MessageActions = BdApi.findModuleByProps("receiveMessage");
         const AvatarDefaults = BdApi.findModuleByProps("BOT_AVATARS");
 
@@ -235,92 +236,156 @@ module.exports = !global.ZeresPluginLibrary ? Dummy : (([Plugin, Api]) => {
             }
         }
 
-        function addCommands()
-        {
-            document.getElementsByClassName('markup-eYLPri editor-H2NA06 slateTextArea-27tjG0 fontSize16Padding-XoMpjI')[0].addEventListener('keydown', async function(e) {
-                if (e.keyCode === 13) {
-                    let text = document.getElementsByClassName('markup-eYLPri editor-H2NA06 slateTextArea-27tjG0 fontSize16Padding-XoMpjI')[0].children[0].children[0].children[0].children[0].textContent
-                    text = text.split(' ')
 
+        
+        function checkForFix(msg){
+            var responseF = ``
+            switch (msg) {
+                case "crashinject": 
+                    responseF = `
+        Try the fixes I provide below:
+        
+        - Fix 1: Reinstall ROBLOX & Synapse
+        - Fix 2: Check for any antivirus software that you may have, common suspects include McAfee, Kaspersky, Bitdefender & Avast. It is recommended for you to uninstall as this software can cause Synapse to have issues even when "disabled".
+        - Fix 3:  Download & install malwarebytes and do a full scan. Then hit quarantine and restart your PC as prompted. There could be malware preventing Synapse from working.
+        - Fix 4 (last resort): Create a new administrative account on your PC.`
+        
+                break;
+                case "invite":
+                    responseF = `
+        Try the fix provided below:
+        Turn on "Discord AutoJoin" in Options.
+        Delete discord.bin and discordtb.bin found inside of the auth folder, then run Synapse as Administrator
+        Make sure your antivirus is turned off`
+                break;
+                case "updated":
+                    responseF = `
+        ROBLOX updates usually occur on wednesdays and Synapse may be outdated. Please wait patiently for Synapse to release an update.`
+                break;
+                case "whitelist24":
+                    responseF = `
+        You must wait 24 hours for your whitelist to reset.
+        Alternatively, you can also privately message an administrator on our discord server.`
+                break;
+                case "pass":
+                    responseF = `
+        To do this:
+        Delete your token.bin file in your /auth/ folder. Restart Synapse X and click "Lost your password".
+        Follow the on-screen instructions to reset your password`
+                break;
+                case "internalerror":
+                    responseF = `
+        Try the fixes I provide below:
+        
+        - Fix 1. Change the time and date settings to automatic.
+        - Fix 2. Change the name of the PC.`
+                break;
+                case "refunds":
+                    responseF = `
+        Per our Terms of Service and End-user License Agreement, we have a strict no refund policy.
+        I. LICENSING
+        (9) Licenses are to be considered irrevocably paid unless Synapse Softworks LLC judges that your
+        individual condition warrants a partial refund.
+        (https://x.synapse.to/contract.pdf)`
+                break;
+                case "uicrash":
+                    responseF = `
+        Try the fixes I provide below:
+        
+        - Fix 1: Terminate all instances of Synapse via Task Manager, delete the bin folder and run Synapse as administrator.
+        - Fix 2: Make sure Synapse is installed correctly. Reinstall synapse if needed.
+        - Fix 3: In rare cases, connections may be blocked by your ISP. It's recommended for you to use a VPN such as ProtonVPN (https://protonvpn.com/download).`
+                break;
+                case "visualstudio":
+                    responseF = `
+        Try the fixes I provide below:
+        
+        - Fix 1: Delete the bin folder located in the Synapse folder and then run Synapse as an administrator.
+        - Fix 2: Download and install the x86 redist package from https://aka.ms/vs/16/release/vc_redist.x86.exe
+        - Fix 3: Reinstall synapse.`
+                break;
+                case "stuckoninjecting":
+                    responseF = `
+        Try the fixes I provide below:
+        
+        - Fix 1: Make sure windows 10 is fully up to date.
+        - Fix 2: Reinstall ROBLOX & Synapse
+        - Fix 3: Check for any antivirus software that you may have, common suspects include McAfee, Kaspersky, Bitdefender & Avast. It is recommended for you to uninstall as this software can cause Synapse to have issues even when "disabled"
+        - Fix 4 (last resort): Create a new user.`
+                break;
+                case "hacked":
+                    responseF = `
+        Delete your token.bin file in your /auth/ folder. Restart Synapse X and click "Lost your password".
+        Follow the on-screen instructions to reset your password`
+                break;
+                case "accessden":
+                    responseF = `
+        Try the fixes I provide below:
                     
-                    if (text[0] == '.b') 
-                    {
-                        let channel = getChannel(BdApi.findModuleByProps("getLastSelectedChannelId", "getChannelId").getChannelId());
-                        await ComponentDispatch.dispatchToLastSubscribed("CLEAR_TEXT")
-                        let contentMessage = ''
+        - Fix 1: Terminate all instances of Synapse via Task Manager, delete the bin folder and run Synapse as administrator.
+        - Fix 2: Make sure Synapse is installed correctly. Reinstall synapse if needed.
+        - Fix 3: In rare cases, connections may be blocked by your ISP. It's recommended for you to use a VPN such as ProtonVPN (https://protonvpn.com/download).`
+                break;
+                case "virus":
+                    responseF = `
+        Synapse X does not contain any form of malware. Detections made by anti-viruses are called false-positives.`
+                break;
+            }
+            return responseF
+        }
+        
+        var obj = {};
+          
+        var regexNew = /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)/g
 
-                        let { getDMFromUserId } = BdApi.findModuleByProps("getDMFromUserId")
-                        let botActualDM = getDMFromUserId(botId)
-                        let nigga = text.slice(1);
-                        console.log(nigga)
+        let cmd = '';
 
-                        switch (nigga[0]) {
-                            case '!verf':
-                                if (channel.recipients.length == 1) {
-                                    if (nigga.length > 2 || nigga.length == 1) {
-                                        MessageCreators.sendBotMessage(BdApi.findModuleByProps("getLastSelectedChannelId", "getChannelId").getChannelId(), ':x: Inside DMs, this command automatically fetches the user ID.:x:\n\n!verf <username>')
-                                        return;
-                                    } 
-                                    delete obj[channel.recipients[0]]
-                                    contentMessage = `!verf ${channel.recipients[0]} ${nigga[1]}`
-                                }
-                                else {  
-                                    if (nigga.length < 3) {
-                                        MessageCreators.sendBotMessage(BdApi.findModuleByProps("getLastSelectedChannelId", "getChannelId").getChannelId(), ':x: You need 3 arguments to use this command outside DMs.:x:\n\n!verf <userid> <username>')
-                                        return;
-                                    } 
-                                    contentMessage = `${nigga.join(" ")}`
-                                }
-                                break;
-                            case '!getp': 
-                                contentMessage = `!getpunishments ${nigga[1] !== undefined ? nigga[1] : ""}`
-                                console.log(nigga[1])
-                                break;
-                            default:
-                                contentMessage = `${nigga.join(" ")}`
-                                break;
-                        }
+        return class SynapseMakeLifeEasier extends Plugin {
+            
+                
+            onStart() {
+
+    
+
+                const MESGID = document.addEventListener('keydown', this.handleKeyDown)
+
+    
+
 
         
-                        proceed = false;
+                let { getDMFromUserId } = BdApi.findModuleByProps("getDMFromUserId")
+                let botDM = getDMFromUserId(botId)
+                fetchMessages({
+                    channelId: botDM, 
+                    limit: 50, 
+                    isPreload: undefined
+                })
+                fetchMessages({
+                    channelId: channelId, 
+                    limit: 1, 
+                    isPreload: undefined
+                })
+                fetchMessages({
+                    channelId: inviterequest, 
+                    limit: 1, 
+                    isPreload: undefined
+                })
 
-                        currChannel = BdApi.findModuleByProps("getLastSelectedChannelId", "getChannelId").getChannelId();
+
+            Patcher.after(SlashCommandStore, "Kh", (_, args, res) => {
+                res.push({
+                    __registerId: "bot2",
+                    applicationId: "betterdiscord",
+                    name: "ss",
+                    displayName: "ss",
+                    description: "screenshot",
+                    displayDescription: "screenshot",
+                    id: "bot-synapse2",
+                    type: 1,
+                    target: 1,
+                    predicate: () => true,
+                    execute: async ([args], {channel}) => {
         
-                        BdApi.findModuleByProps('sendMessage').sendMessage(contentMessage.startsWith('!getpunishments') ? botActualDM : contentMessage.startsWith('!unban') ? '1011089597171765288' : channelId, {content: contentMessage, tts: false, invalidEmojis: [], validNonShortcutEmojis: []}, undefined, {});
-                        
-                        await new Promise((resolve, reject) => {
-                            let i = 0;
-                            let interval = setInterval(() => {
-                                if (i > 7500) {
-                                    clearInterval(interval);
-                                    recentBotMsg = `<@!${botId}> didn't respond in time.`;
-                                    return resolve();
-                                }
-        
-                                if (proceed === true) {
-                                    clearInterval(interval);
-                                    proceed = false;
-                                    return resolve();
-                                }
-        
-                                i += 10;
-                            }, 10)
-                        })
-                        MessageCreators.sendBotMessage(currChannel, recentBotMsg)
-
-                    }
-                    else if (text[0] == ".q")
-                    {
-                        currChannel = BdApi.findModuleByProps("getLastSelectedChannelId", "getChannelId").getChannelId();
-                        await ComponentDispatch.dispatchToLastSubscribed("CLEAR_TEXT")
-                        BdApi.findModuleByProps('sendMessage').sendMessage(currChannel, {content: "Please state your **Synapse X** username.", tts: false, invalidEmojis: [], validNonShortcutEmojis: []}, undefined, {});
-                    }
-                    else if (text[0] == ".ss")
-                    {
-                        await ComponentDispatch.dispatchToLastSubscribed("CLEAR_TEXT")
-
-                        let newCurrChannel = BdApi.findModuleByProps("getLastSelectedChannelId", "getChannelId").getChannelId();
-
                         let { getDMFromUserId } = BdApi.findModuleByProps("getDMFromUserId")
         
                         let botDM = getDMFromUserId(botId)
@@ -331,22 +396,36 @@ module.exports = !global.ZeresPluginLibrary ? Dummy : (([Plugin, Api]) => {
                             isPreload: undefined
                         })
         
-                        await fetchMessages({
-                            channelId: newCurrChannel, 
+                      await fetchMessages({
+                            channelId: channel.id, 
                             limit: 20, 
                             isPreload: undefined
                         })
         
         
+                        const receivedMessage = MessageCreators.createBotMessage({channelId: channel.id});    
+                        receivedMessage.author.username = 'robotic yorki';
+                        receivedMessage.author.discriminator = '0700';
+                        receivedMessage.author.id = '982751970173550612';
+                        receivedMessage.flags = 128 + 64;
+                        receivedMessage.author.avatar = '4f0025a913750458f163f96b99d58c3b';
+                        MessageActions.receiveMessage(channel.id, receivedMessage);
+        
+                        let botMessage = _(getMessages(channel.id).toArray()).reverse().find((message)=>{
+                            if(message.author.id === "982751970173550612"){
+                                return message
+                            }
+                        })
+        
                         const regex = /([a-z0-9]){8}-([a-z0-9]){4}-([a-z0-9]){4}-([a-z0-9]){4}-([a-z0-9]){12}/g
         
                         let match3 = ''
         
-                        let message3 = _(getMessages(newCurrChannel).toArray()).reverse().find((message5) => {
+                        let message3 = _(getMessages(channel.id).toArray()).reverse().find((message5) => {
                             let match = regex.exec(message5?.content)
                             if (match === null) return;
                             match3 = match;
-                            if (message5.author.id !== userid && message5.author.id !== "1") {
+                            if (message5.author.id !== userid && message5.author.id !== "982751970173550612" && message5.author.id !== "983394662716952616") {
                                 return message5
                             }
                         })
@@ -355,7 +434,13 @@ module.exports = !global.ZeresPluginLibrary ? Dummy : (([Plugin, Api]) => {
                     
         
                         if (message3 === undefined) {
-                            MessageCreators.sendBotMessage(newCurrChannel, ":x: Couldn't find any token :x:")
+                            await new Promise(r => setTimeout(r,  2000));
+                            setTimeout(()=>{
+                                let newBotMessage = Object.assign(botMessage, {editedTimestamp: moment()})
+                                newBotMessage.flags = 64;
+                                newBotMessage.content = ":x: Couldn't find any token :x:";
+                                dirtyDispatch({type: "MESSAGE_UPDATE", message: newBotMessage})
+                            }, 50)
                             return;
                         }
         
@@ -369,14 +454,14 @@ module.exports = !global.ZeresPluginLibrary ? Dummy : (([Plugin, Api]) => {
         
                         let finaldate2 = split2[0];
         
-                        
+                       
                         finaldate = newDate(finaldate);
         
                         finaldate2 = amORpm(finaldate2);
         
         
         
-                        //  create ascii art from punctuation marks an image of a horse
+                      //  create ascii art from punctuation marks an image of a horse
         
                     
         
@@ -396,7 +481,7 @@ module.exports = !global.ZeresPluginLibrary ? Dummy : (([Plugin, Api]) => {
                         //add image
         
         
-                        
+                       
         
         
                 
@@ -406,7 +491,7 @@ module.exports = !global.ZeresPluginLibrary ? Dummy : (([Plugin, Api]) => {
                         const username = message3.author.username;
                         const token = match3[0];
                         const date = `${finaldate[0]}:${split2[1]} ${finaldate2}`;
-                        
+                      
                         ctx.font = '18px Whitney, "Helvetica Neue", Helvetica, Arial, sans-serif';
                         ctx.fillStyle = '#fff';
                         ctx.strokeStyle = 'black'
@@ -498,7 +583,13 @@ module.exports = !global.ZeresPluginLibrary ? Dummy : (([Plugin, Api]) => {
                     })
         
                     if (mesg ===  undefined) {
-                        MessageCreators.sendBotMessage(newCurrChannel, ":x: Couldn't find token in bot DMs :x:")
+                        await new Promise(r => setTimeout(r,  2000));
+                        setTimeout(()=>{
+                            let newBotMessage = Object.assign(botMessage, {editedTimestamp: moment()})
+                            newBotMessage.flags = 64;
+                            newBotMessage.content = ":x: Couldn't find token in bot DMs :x:";
+                            dirtyDispatch({type: "MESSAGE_UPDATE", message: newBotMessage})
+                        }, 50)
                         return;
         
                     }
@@ -614,688 +705,158 @@ module.exports = !global.ZeresPluginLibrary ? Dummy : (([Plugin, Api]) => {
                     })
         
         
-                    MessageCreators.sendBotMessage(newCurrChannel, `:white_check_mark: Successfully sent in the <#${inviterequest}> channel! :white_check_mark:`)
-                        
-                    }
-                }
-            })
-        }
-        
-        function checkForFix(msg){
-            var responseF = ``
-            switch (msg) {
-                case "crashinject": 
-                    responseF = `
-        Try the fixes I provide below:
-        
-        - Fix 1: Reinstall ROBLOX & Synapse
-        - Fix 2: Check for any antivirus software that you may have, common suspects include McAfee, Kaspersky, Bitdefender & Avast. It is recommended for you to uninstall as this software can cause Synapse to have issues even when "disabled".
-        - Fix 3:  Download & install malwarebytes and do a full scan. Then hit quarantine and restart your PC as prompted. There could be malware preventing Synapse from working.
-        - Fix 4 (last resort): Create a new administrative account on your PC.`
-        
-                break;
-                case "invite":
-                    responseF = `
-        Try the fix provided below:
-        Turn on "Discord AutoJoin" in Options.
-        Delete discord.bin and discordtb.bin found inside of the auth folder, then run Synapse as Administrator
-        Make sure your antivirus is turned off`
-                break;
-                case "updated":
-                    responseF = `
-        ROBLOX updates usually occur on wednesdays and Synapse may be outdated. Please wait patiently for Synapse to release an update.`
-                break;
-                case "whitelist24":
-                    responseF = `
-        You must wait 24 hours for your whitelist to reset.
-        Alternatively, you can also privately message an administrator on our discord server.`
-                break;
-                case "pass":
-                    responseF = `
-        To do this:
-        Delete your token.bin file in your /auth/ folder. Restart Synapse X and click "Lost your password".
-        Follow the on-screen instructions to reset your password`
-                break;
-                case "internalerror":
-                    responseF = `
-        Try the fixes I provide below:
-        
-        - Fix 1. Change the time and date settings to automatic.
-        - Fix 2. Change the name of the PC.`
-                break;
-                case "refunds":
-                    responseF = `
-        Per our Terms of Service and End-user License Agreement, we have a strict no refund policy.
-        I. LICENSING
-        (9) Licenses are to be considered irrevocably paid unless Synapse Softworks LLC judges that your
-        individual condition warrants a partial refund.
-        (https://x.synapse.to/contract.pdf)`
-                break;
-                case "uicrash":
-                    responseF = `
-        Try the fixes I provide below:
-        
-        - Fix 1: Terminate all instances of Synapse via Task Manager, delete the bin folder and run Synapse as administrator.
-        - Fix 2: Make sure Synapse is installed correctly. Reinstall synapse if needed.
-        - Fix 3: In rare cases, connections may be blocked by your ISP. It's recommended for you to use a VPN such as ProtonVPN (https://protonvpn.com/download).`
-                break;
-                case "visualstudio":
-                    responseF = `
-        Try the fixes I provide below:
-        
-        - Fix 1: Delete the bin folder located in the Synapse folder and then run Synapse as an administrator.
-        - Fix 2: Download and install the x86 redist package from https://aka.ms/vs/16/release/vc_redist.x86.exe
-        - Fix 3: Reinstall synapse.`
-                break;
-                case "stuckoninjecting":
-                    responseF = `
-        Try the fixes I provide below:
-        
-        - Fix 1: Make sure windows 10 is fully up to date.
-        - Fix 2: Reinstall ROBLOX & Synapse
-        - Fix 3: Check for any antivirus software that you may have, common suspects include McAfee, Kaspersky, Bitdefender & Avast. It is recommended for you to uninstall as this software can cause Synapse to have issues even when "disabled"
-        - Fix 4 (last resort): Create a new user.`
-                break;
-                case "hacked":
-                    responseF = `
-        Delete your token.bin file in your /auth/ folder. Restart Synapse X and click "Lost your password".
-        Follow the on-screen instructions to reset your password`
-                break;
-                case "accessden":
-                    responseF = `
-        Try the fixes I provide below:
-                    
-        - Fix 1: Terminate all instances of Synapse via Task Manager, delete the bin folder and run Synapse as administrator.
-        - Fix 2: Make sure Synapse is installed correctly. Reinstall synapse if needed.
-        - Fix 3: In rare cases, connections may be blocked by your ISP. It's recommended for you to use a VPN such as ProtonVPN (https://protonvpn.com/download).`
-                break;
-                case "virus":
-                    responseF = `
-        Synapse X does not contain any form of malware. Detections made by anti-viruses are called false-positives.`
-                break;
-            }
-            return responseF
-        }
-        
-        var obj = {};
-          
-        var regexNew = /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)/g
-
-        let cmd = '';
-
-        const targetNode = document.getElementsByClassName('content-1SgpWY')[0]
-
-        const callback = async (mutationList, observer) => {
-            for (const mutation of mutationList) { 
-                mutation.removedNodes.forEach((node) => {
-                    if (node.className == "chatContent-3KubbW" || node.className == "voiceChannelEffectsLayerContainer-1rDYWI")
-                    {
-                        console.log('refreshed')
-                        addCommands();
-                    }
-                })
-                mutation.addedNodes.forEach((node) => {
-                    if (node.className == "chat-2ZfjoI")
-                    {
-                       console.log('added')
-                       addCommands();
-                    }
-                })
-            }
-          };
-
-
-        const observer = new MutationObserver(callback);
-
-        return class SynapseMakeLifeEasier extends Plugin {
-            
-                
-            onStart() {
-        
-                const config = { attributes: true, childList: true, subtree: true };
-                // Start observing the target node for configured mutations
-                observer.observe(targetNode, config);
-
-                const MESGID = document.addEventListener('keydown', this.handleKeyDown)
-
-    
-
-
-        
-                let { getDMFromUserId } = BdApi.findModuleByProps("getDMFromUserId")
-                let botDM = getDMFromUserId(botId)
-                fetchMessages({
-                    channelId: botDM, 
-                    limit: 50, 
-                    isPreload: undefined
-                })
-                fetchMessages({
-                    channelId: channelId, 
-                    limit: 1, 
-                    isPreload: undefined
-                })
-                fetchMessages({
-                    channelId: inviterequest, 
-                    limit: 1, 
-                    isPreload: undefined
-                })
-        
-                
-                // showToast({
-                //     id: "MYTOAST",
-                //     type: 3,
-                //     options: {
-                //       position: 1,
-                //       component: ce(Component)
-                //       }
-                //   })
-                // DiscordCommands.push({
-                //     applicationId: "bot2",
-                //     name: "ss",
-                //     displayName: "ss",
-                //     description: "screenshot",
-                //     displayDescription: "screenshot",
-                //     inputType: 0,
-                //     id: "bot-synapse",
-                //     type: 1,
-                //     predicate: () => true,
-                //     execute: async ([args], {channel}) => {
-        
-                //         let { getDMFromUserId } = BdApi.findModuleByProps("getDMFromUserId")
-        
-                //         let botDM = getDMFromUserId(botId)
-        
-                //         fetchMessages({
-                //             channelId: botDM, 
-                //             limit: 20, 
-                //             isPreload: undefined
-                //         })
-        
-                //       await fetchMessages({
-                //             channelId: channel.id, 
-                //             limit: 20, 
-                //             isPreload: undefined
-                //         })
-        
-        
-                //         const receivedMessage = MessageCreators.createBotMessage({channelId: channel.id});    
-                //         receivedMessage.author.username = 'robotic yorki';
-                //         receivedMessage.author.discriminator = '0700';
-                //         receivedMessage.author.id = '982751970173550612';
-                //         receivedMessage.flags = 128 + 64;
-                //         receivedMessage.author.avatar = '4f0025a913750458f163f96b99d58c3b';
-                //         MessageActions.receiveMessage(channel.id, receivedMessage);
-        
-                //         let botMessage = _(getMessages(channel.id).toArray()).reverse().find((message)=>{
-                //             if(message.author.id === "982751970173550612"){
-                //                 return message
-                //             }
-                //         })
-        
-                //         const regex = /([a-z0-9]){8}-([a-z0-9]){4}-([a-z0-9]){4}-([a-z0-9]){4}-([a-z0-9]){12}/g
-        
-                //         let match3 = ''
-        
-                //         let message3 = _(getMessages(channel.id).toArray()).reverse().find((message5) => {
-                //             let match = regex.exec(message5?.content)
-                //             if (match === null) return;
-                //             match3 = match;
-                //             if (message5.author.id !== userid && message5.author.id !== "982751970173550612" && message5.author.id !== "983394662716952616") {
-                //                 return message5
-                //             }
-                //         })
-        
-            
-                    
-        
-                //         if (message3 === undefined) {
-                //             await new Promise(r => setTimeout(r,  2000));
-                //             setTimeout(()=>{
-                //                 let newBotMessage = Object.assign(botMessage, {editedTimestamp: moment()})
-                //                 newBotMessage.flags = 64;
-                //                 newBotMessage.content = ":x: Couldn't find any token :x:";
-                //                 dirtyDispatch({type: "MESSAGE_UPDATE", message: newBotMessage})
-                //             }, 50)
-                //             return;
-                //         }
-        
-                
-        
-                //         let split = message3.timestamp._d.toString().split(" ")
-                        
-                //         let split2 = split[4].toString().split(":")
-        
-                //         let finaldate = split2[0];
-        
-                //         let finaldate2 = split2[0];
-        
-                       
-                //         finaldate = newDate(finaldate);
-        
-                //         finaldate2 = amORpm(finaldate2);
-        
-        
-        
-                //       //  create ascii art from punctuation marks an image of a horse
-        
-                    
-        
-        
-        
-        
-        
-                //         var canvas = document.createElement('canvas');
-                //         canvas.height = 80;
-                //         canvas.width = 572;
-                //         var ctx = canvas.getContext('2d');
-                //         ctx.fillStyle = '#36393f';
-                //         ctx.fillRect(0, 0, canvas.width, canvas.height);
-        
-                //         let image = `https://cdn.discordapp.com/avatars/${message3.author.id}/${message3.author.avatar}.webp?size=80`
-        
-                //         //add image
-        
-        
-                       
-        
-        
-                
-        
-                //         // ctx.strokeRect(0, 0, canvas.width, canvas.height);
-        
-                //         const username = message3.author.username;
-                //         const token = match3[0];
-                //         const date = `${finaldate[0]}:${split2[1]} ${finaldate2}`;
-                      
-                //         ctx.font = '18px Whitney, "Helvetica Neue", Helvetica, Arial, sans-serif';
-                //         ctx.fillStyle = '#fff';
-                //         ctx.strokeStyle = 'black'
-                //         ctx.textAlign = 'left';
-                //         ctx.fillText(username, 90, 31);
-        
-                //         ctx.font = '17px Whitney, "Helvetica Neue", Helvetica, Arial, sans-serif';
-                //         ctx.fillStyle = '#caccce';
-                //         ctx.strokeStyle = 'black'
-                //         ctx.textAlign = 'left';
-                //         ctx.fillText(token, 90, 60);
-        
-                //         // function that rounds to the nearest 10#
-        
-                //         function round(num) {
-                //             return Math.ceil(num / 10) * 10;
-                //         }
-        
-                //         console.log(round(Math.round(ctx.measureText(username).width)))
-        
-                        
-                        
-                //         const lol = round(Math.round(ctx.measureText(username).width) + (Math.round(ctx.measureText(username).width / 100) * 4)) - 119
-        
-                        
-                        
-                //         ctx.font = '14px Whitney, "Helvetica Neue", Helvetica, Arial, sans-serif';
-                //         ctx.fillStyle = '#a3a6aa';
-                //         ctx.fillText(`Today at ${date}`, 218 + lol , 31);
-        
-        
-                //         await new Promise(r => setTimeout(r,  350));
-        
-                        
-        
-                //         var img = new Image();
-        
-                //         img.onload = () => {
-                //             ctx.beginPath();
-                //             ctx.arc(40,40,25,0,Math.PI*2,true);
-                //             ctx.closePath();
-                //             ctx.clip();
-                //             ctx.imageSmoothingQuality = 'high';
-                //             ctx.drawImage(img, 15, 15, 50, 50);
-                //         };
-                //         img.setAttribute('crossOrigin','anonymous');
-                //         img.src = image.toString(); 
-        
-                    
-                        
-                //         await new Promise(r => setTimeout(r, 350));
-                    
-                //         // ctx.beginPath();
-                //         // ctx.arc(40,40,25,0,Math.PI*2,true);
-                //         // ctx.fillStyle = '#36393f';
-                //         // ctx.fill();
-                //         // ctx.closePath();
-                //         // ctx.clip();
-                //         // ctx.imageSmoothingQuality = 'high';
-                //         // ctx.drawImage(img, 15, 15, 50, 50);
-        
-                        
-                //         try {
-                //             var img2 = canvas.toDataURL('image/jpeg', 0.9).split(',')[1];
-                //         } catch(e) {
-                //             var img2 = canvas.toDataURL().split(',')[1];
-                //         }
-        
-                //         let readyImage = ''
-        
-                    
-                        
-                //     await fetch("https://api.imgur.com/3/image/", {
-                //         method: "post",
-                //         headers: {
-                //             Authorization: "Client-ID 2f30b05e58882e9"
-                //         },
-                //         body: img2
-                //     }).then(data => data.json()).then(async data => {
-                //         readyImage = await data.data.link
-                //         readyImage += "\n"
-                //     })
-        
-                    
-                //     let mesg = _(getMessages(botDM).toArray()).reverse().find((message2) => {
-                //         if (message2.embeds[0]?.rawDescription?.indexOf(match3[0]) > -1) {
-                //             return message2
-                //         }
-                //     })
-        
-                //     if (mesg ===  undefined) {
-                //         await new Promise(r => setTimeout(r,  2000));
-                //         setTimeout(()=>{
-                //             let newBotMessage = Object.assign(botMessage, {editedTimestamp: moment()})
-                //             newBotMessage.flags = 64;
-                //             newBotMessage.content = ":x: Couldn't find token in bot DMs :x:";
-                //             dirtyDispatch({type: "MESSAGE_UPDATE", message: newBotMessage})
-                //         }, 50)
-                //         return;
-        
-                //     }
-                    
-                //     var canvas2 = document.createElement('canvas');
-                //     canvas2.height = 420;
-                //     canvas2.width = 1400;
-        
-                //     canvas2.style.width = canvas2.width / 3 + "px";
-                //     canvas2.style.height = canvas2.height / 3 + "px";
-        
-                //     var ctx2 = canvas2.getContext('2d')
-                
-        
-                //     var scale = 1600/500;
-                //     ctx2.setTransform(scale,0,0,scale,0,0);
-        
-        
-                //     ctx2.fillStyle = '#36393f';
-                //     ctx2.fillRect(0, 0, canvas2.width, canvas2.height);
-        
-                //     const regex2 = /(?!User Email)(?<=\:..).*\w+/g
-        
-        
-                //     const email = regex2.exec(mesg.embeds[0].rawDescription);
-                //     const ID = mesg.embeds[0].footer.text
-        
-        
-                //     if (email === null || ID === null) return;
-        
-        
-                //     ctx2.beginPath();
-                //     ctx2.roundRect(30, 6, 370, 120, 6);
-                //     ctx2.fillStyle = '#2f3136';
-                //     ctx2.fill();
-                //     ctx2.closePath()
-                //     ctx2.clip()
-                //     ctx2.font = '12px Whitney, "Helvetica Neue", Helvetica, Arial, sans-serif';
-                //     ctx2.fillStyle = '#FFFF';
-                //     ctx2.textAlign = 'left';
-                //     ctx2.fillText("SX Bot", 45, 35);
-        
-        
-                //     ctx2.font = '10px Whitney, "Helvetica Neue", Helvetica, Arial, sans-serif';
-                //     ctx2.fillStyle = '#DCDDDE';
-                //     ctx2.textAlign = 'left';
-                //     ctx2.fillText("Successfully sent authentication email. Please verify the following info:", 45, 56);
-        
-                //     ctx2.font = '11px Whitney, "Helvetica Neue", Helvetica, Arial, sans-serif';
-                //     ctx2.fillStyle = '#DCDDDE';
-                //     ctx2.textAlign = 'left';
-                //     ctx2.fillText("User Email:", 45, 85);
-        
-        
-                //     ctx2.font = '11px Whitney, "Helvetica Neue", Helvetica, Arial, sans-serif';
-                //     ctx2.fillStyle = '#DCDDDE';
-                //     ctx2.textAlign = 'left';
-                //     ctx2.fillText("Verification Token:", 45, 100);
-                    
-                
-                //     ctx2.beginPath();
-                //     ctx2.roundRect(30, 6, 3.5, 160, 2.72);
-                //     ctx2.fillStyle = '#fff';
-                //     ctx2.fill();
-        
-                //     ctx2.beginPath();
-                //     ctx2.roundRect(105, 75.5, ctx2.measureText(email).width - (ctx2.measureText(email).width / 10) , 13.5, 2.72);
-                //     ctx2.fillStyle = '#202225';
-                //     ctx2.fill();
-        
-                //     ctx2.font = '9px Whitney, "Helvetica Neue", Helvetica, Arial, sans-serif';
-                //     ctx2.fillStyle = '#fff';
-                //     ctx2.textAlign = 'left';
-                //     ctx2.fillText(email, 110, 85);
-        
-        
-                //     ctx2.beginPath();
-                //     ctx2.roundRect(138, 90, 170, 13.5,2);
-                //     ctx2.fillStyle = '#202225';
-                //     ctx2.fill();
-        
-                //     ctx2.font = '9px Whitney, "Helvetica Neue", Helvetica, Arial, sans-serif';
-                //     ctx2.fillStyle = '#fff';
-                //     ctx2.textAlign = 'left';
-                //     ctx2.fillText(token, 143, 100);
-        
-        
-                //     ctx2.font = '9px Whitney, "Helvetica Neue", Helvetica, Arial, sans-serif';
-                //     ctx2.fillStyle = '#fff';
-                //     ctx2.textAlign = 'left';
-                //     ctx2.fillText(ID + ` • Today at ${date}`, 45, 118);
-        
-        
-                //     ctx2.closePath()
-        
-                //     try {
-                //         var img3 = canvas2.toDataURL('image/jpeg', 0.9).split(',')[1];
-                //     } catch(e) {
-                //         var img3 = canvas2.toDataURL().split(',')[1];
-                //     }
-        
-                //     let readyImage2 = ''
-                        
-                //     await fetch("https://api.imgur.com/3/image/", {
-                //         method: "post",
-                //         headers: {
-                //             Authorization: "Client-ID 2f30b05e58882e9"
-                //         },
-                //         body: img3
-                //     }).then(data => data.json()).then(async data => {
-                //         readyImage += await data.data.link;
-                //         BdApi.findModuleByProps('_sendMessage').sendMessage(inviterequest, {content: readyImage, tts: false, invalidEmojis: [], validNonShortcutEmojis: []}, undefined, {});
-                //     })
-        
-        
-                //     setTimeout(()=>{
-                //         let newBotMessage = Object.assign(botMessage, {editedTimestamp: moment()})
-                //         newBotMessage.flags = 64;
-                //         newBotMessage.content = `:white_check_mark: Successfully sent in the <#${inviterequest}> channel! :white_check_mark:`;
-                //         dirtyDispatch({type: "MESSAGE_UPDATE", message: newBotMessage})
-                //     }, 50)
+                    setTimeout(()=>{
+                        let newBotMessage = Object.assign(botMessage, {editedTimestamp: moment()})
+                        newBotMessage.flags = 64;
+                        newBotMessage.content = `:white_check_mark: Successfully sent in the <#${inviterequest}> channel! :white_check_mark:`;
+                        dirtyDispatch({type: "MESSAGE_UPDATE", message: newBotMessage})
+                    }, 50)
                      
-                //     }
+                    }
         
-                // })
+                })
         
-                // DiscordCommands.push({
-                //     applicationId: "betterdiscord",
-                //     name: "b",
-                //     displayName: "b",
-                //     description: "sends to staffbot",
-                //     displayDescription: "sends to staffbot",
-                //     id: "bot-synapse3",
-                //     type: 1,
-                //     target: 1,
-                //     predicate: () => true,
-                //     options: [{
-                //         description: "",
-                //         displayDescription: "",
-                //         displayName: "message",
-                //         name: "message",
-                //         type: 3
-                //     }],
-                //     execute: async ([args], {channel}) => {
+                res.push({
+                    __registerId: "bot2",
+                    applicationId: "betterdiscord",
+                    name: "b",
+                    displayName: "b",
+                    description: "sends to staffbot",
+                    displayDescription: "sends to staffbot",
+                    id: "bot-synapse",
+                    type: 1,
+                    target: 1,
+                    predicate: () => true,
+                    options: [{
+                        description: "",
+                        displayDescription: "",
+                        displayName: "message",
+                        name: "message",
+                        type: 3
+                    }],
+                    execute: async ([args], {channel}) => {
                     
-                //         proceed = false;
+                        proceed = false;
         
+                        let contentMessage = ''
         
-        
-                //         const receivedMessage = MessageCreators.createBotMessage({channelId: channel.id});    
-                //         receivedMessage.author.username = 'robotic yorki';
-                //         receivedMessage.author.discriminator = '0700';
-                //         receivedMessage.author.id = '982751970173550612';
-                //         receivedMessage.flags = 128 + 64;
-                //         receivedMessage.author.avatar = '4f0025a913750458f163f96b99d58c3b';
-        
-                //         const receivedMessage2 = MessageCreators.createBotMessage({channelId: channel.id}); 
-                //         receivedMessage2.author.username = 'robotic yorki';
-                //         receivedMessage2.author.discriminator = '0700';
-                //         receivedMessage2.author.id = '982751970173550612';
-                //         receivedMessage2.flags = 64;
-                //         receivedMessage2.author.avatar = '4f0025a913750458f163f96b99d58c3b';
-                               
-                //         MessageActions.receiveMessage(channel.id, receivedMessage);
-        
-                //         let botMessage = _(getMessages(channel.id).toArray()).reverse().find((message)=>{
-                //             if(message.author.id === "982751970173550612"){
-                //                 return message
-                //             }
-                //         })
-        
-                //         let contentMessage = ''
-        
-                //         let { getDMFromUserId } = BdApi.findModuleByProps("getDMFromUserId")
-                //         let botActualDM = getDMFromUserId(botId)
-                //         let nigga = args.value.split(" ");
+                        let { getDMFromUserId } = BdApi.findModuleByProps("getDMFromUserId")
+                        let botActualDM = getDMFromUserId(botId)
+                        let nigga = args.value.split(" ");
 
-                //         switch (args.value.split(' ')[0]) {
-                //             case '!verf':
-                //                 if (channel.recipients.length == 1) {
-                //                     if (nigga.length > 2 || nigga.length == 1) {
-                //                         receivedMessage2.content = ':x: Inside DMs, this command automatically fetches the user ID.:x:\n\n!verf <username>';
-                //                         MessageActions.receiveMessage(channel.id, receivedMessage2);
-                //                         return;
-                //                     } 
-                //                     delete obj[channel.recipients[0]]
-                //                     contentMessage = `!verf ${channel.recipients[0]} ${nigga[1]}`
-                //                 }
-                //                 else {  
-                //                     if (nigga.length < 3) {
-                //                         receivedMessage2.content = ':x: You need 3 arguments to use this command outside DMs.:x:\n\n!verf <userid> <username>';
-                //                         MessageActions.receiveMessage(channel.id, receivedMessage2);
-                //                         return;
-                //                     } 
-                //                     contentMessage = args.value
-                //                 }
-                //                 break;
-                //             case '!getp': 
-                //                 contentMessage = `!getpunishments ${nigga[1]}`
-                //                 break;
-                //             default:
-                //                 contentMessage = args.value
-                //                 break;
-                //         }
+                        switch (args.value.split(' ')[0]) {
+                            case '!verf':
+                                if (channel.recipients.length == 1) {
+                                    if (nigga.length > 2 || nigga.length == 1) {
+                                        receivedMessage2.content = ':x: Inside DMs, this command automatically fetches the user ID.:x:\n\n!verf <username>';
+                                        MessageActions.receiveMessage(channel.id, receivedMessage2);
+                                        return;
+                                    } 
+                                    delete obj[channel.recipients[0]]
+                                    contentMessage = `!verf ${channel.recipients[0]} ${nigga[1]}`
+                                }
+                                else {  
+                                    if (nigga.length < 3) {
+                                        receivedMessage2.content = ':x: You need 3 arguments to use this command outside DMs.:x:\n\n!verf <userid> <username>';
+                                        MessageActions.receiveMessage(channel.id, receivedMessage2);
+                                        return;
+                                    } 
+                                    contentMessage = args.value
+                                }
+                                break;
+                            case '!getp': 
+                                contentMessage = `!getpunishments ${nigga[1]}`
+                                break;
+                            default:
+                                contentMessage = args.value
+                                break;
+                        }
 
         
-                //         proceed = false;
+                        proceed = false;
 
-                //         currChannel = channel.id;
+                        currChannel = channel.id;
         
-                //         BdApi.findModuleByProps('sendMessage').sendMessage(contentMessage.startsWith('!getpunishments') ? botActualDM : contentMessage.startsWith('!unban') ? '1011089597171765288' : channelId, {content: contentMessage, tts: false, invalidEmojis: [], validNonShortcutEmojis: []}, undefined, {});
+                        BdApi.findModuleByProps('sendMessage').sendMessage(contentMessage.startsWith('!getpunishments') ? botActualDM : channelId, {content: contentMessage, tts: false, invalidEmojis: [], validNonShortcutEmojis: []}, undefined, {});
                         
-                //         await new Promise((resolve, reject) => {
-                //             let i = 0;
-                //             let interval = setInterval(() => {
-                //                 if (i > 7500) {
-                //                     clearInterval(interval);
-                //                     recentBotMsg = `<@!${botId}> didn't respond in time.`;
-                //                     return resolve();
-                //                 }
+                        await new Promise((resolve, reject) => {
+                            let i = 0;
+                            let interval = setInterval(() => {
+                                if (i > 7500) {
+                                    clearInterval(interval);
+                                    recentBotMsg = `<@!${botId}> didn't respond in time.`;
+                                    return resolve();
+                                }
         
-                //                 if (proceed === true) {
-                //                     clearInterval(interval);
-                //                     proceed = false;
-                //                     return resolve();
-                //                 }
+                                if (proceed === true) {
+                                    clearInterval(interval);
+                                    proceed = false;
+                                    return resolve();
+                                }
         
-                //                 i += 10;
-                //             }, 10)
-                //         })
+                                i += 10;
+                            }, 10)
+                        })
         
                         
-                //         setTimeout(()=>{
-                //             let newBotMessage = Object.assign(botMessage, {editedTimestamp: moment()})
-                //             newBotMessage.flags = 64;
-                //             newBotMessage.content = recentBotMsg;
-                //             dirtyDispatch({type: "MESSAGE_UPDATE", message: newBotMessage})
-                //         }, 50)
+                        MessageCreators.sendBotMessage(currChannel, recentBotMsg)
                        
                      
-                //     }
+                    }
         
-                // })
-                // DiscordCommands.push({
-                //     applicationId: "betterdiscord",
-                //     name: "/q",
-                //     displayName: '/q',
-                //     description: "asks for username",
-                //     displayDescription: "asks for username",
-                //     id: "bot-synapse3",
-                //     type: 1,
-                //     target: 1,
-                //     predicate: () => true,
-                //     options: [],
-                //     execute: async ([args], {channel}) => {
+                })
+                res.push({
+                    __registerId: "bot2",
+                    applicationId: "betterdiscord",
+                    name: "/q",
+                    displayName: '/q',
+                    description: "asks for username",
+                    displayDescription: "asks for username",
+                    id: "bot-synapse3",
+                    type: 1,
+                    target: 1,
+                    predicate: () => true,
+                    options: [],
+                    execute: async ([args], {channel}) => {
         
-                //         let chnl = BdApi.findModuleByProps("getLastSelectedChannelId", "getChannelId").getChannelId();
+                        let chnl = BdApi.findModuleByProps("getLastSelectedChannelId", "getChannelId").getChannelId();
                     
-                //         BdApi.findModuleByProps('sendMessage').sendMessage(chnl, {content: "Please state your **Synapse X** username.", tts: false, invalidEmojis: [], validNonShortcutEmojis: []}, undefined, {});
+                        BdApi.findModuleByProps('sendMessage').sendMessage(chnl, {content: "Please state your **Synapse X** username.", tts: false, invalidEmojis: [], validNonShortcutEmojis: []}, undefined, {});
                      
-                //     }
+                    }
         
-                // })
-                // DiscordCommands.push({
-                //     applicationId: "betterdiscord",
-                //     name: "help",
-                //     displayName: 'help',
-                //     description: "all available commands",
-                //     displayDescription: "all available commands",
-                //     id: "bot-synapse3",
-                //     type: 1,
-                //     target: 1,
-                //     predicate: () => true,
-                //     options: [],
-                //     execute: async ([args], {channel}) => {
+                })
+                res.push({
+                    __registerId: "bot2",
+                    applicationId: "betterdiscord",
+                    name: "help",
+                    displayName: 'help',
+                    description: "all available commands",
+                    displayDescription: "all available commands",
+                    id: "bot-synapse3",
+                    type: 1,
+                    target: 1,
+                    predicate: () => true,
+                    options: [],
+                    execute: async ([args], {channel}) => {
         
-                //         const receivedMessage = MessageCreators.createBotMessage({channelId: channel.id});    
-                //         receivedMessage.author.username = 'robotic yorki';
-                //         receivedMessage.author.discriminator = '0700';
-                //         receivedMessage.author.id = '982751970173550612';
-                //         receivedMessage.flags = 64;
-                //         receivedMessage.author.avatar = '4f0025a913750458f163f96b99d58c3b';
+                        const receivedMessage = MessageCreators.createBotMessage({channelId: channel.id});    
+                        receivedMessage.author.username = 'robotic yorki';
+                        receivedMessage.author.discriminator = '0700';
+                        receivedMessage.author.id = '982751970173550612';
+                        receivedMessage.flags = 64;
+                        receivedMessage.author.avatar = '4f0025a913750458f163f96b99d58c3b';
         
         
-                //         receivedMessage.content = `Here are the available commands for making your synapse staffing easeier:\n----------------------------------\n"/b [any synapse command]" - will send any synapse command to staff-bot and retrieve the bot message in the current channel\n\n Some examples:\n\n "/b !getinv" - will automatically copy the invite link\n"/b !verf [username]" - this command doesn't require the user ID anymore\n----------------------------------\n"/ss" - helpers can use this to automatically screenshot verification tokens and send them inside #invite-request\n----------------------------------\n"//q" - Ask for synapse username\n----------------------------------\nKey binds:\n\n"CTRL + B" - if the user's last message is their username (only their username in one single line) or you have selected their username on discord, it will automatically generate the auth command with their username.\n "CTRL + N" - will automatically generate the verify command with their username (CTRL + B has to be performed first for this command to work)` 
+                        receivedMessage.content = `Here are the available commands for making your synapse staffing easeier:\n----------------------------------\n"/b [any synapse command]" - will send any synapse command to staff-bot and retrieve the bot message in the current channel\n\n Some examples:\n\n "/b !getinv" - will automatically copy the invite link\n"/b !verf [username]" - this command doesn't require the user ID anymore\n----------------------------------\n"/ss" - helpers can use this to automatically screenshot verification tokens and send them inside #invite-request\n----------------------------------\n"//q" - Ask for synapse username\n----------------------------------\nKey binds:\n\n"CTRL + B" - if the user's last message is their username (only their username in one single line) or you have selected their username on discord, it will automatically generate the auth command with their username.\n "CTRL + N" - will automatically generate the verify command with their username (CTRL + B has to be performed first for this command to work)` 
                      
-                //         MessageActions.receiveMessage(channel.id, receivedMessage);
+                        MessageActions.receiveMessage(channel.id, receivedMessage);
         
-                //     }
+                    }
         
-                // })
+                })
+        
+                })
                 BdApi.Webpack.getModule(BdApi.Webpack.Filters.byProps("dispatch", "_actionHandlers")).subscribe('MESSAGE_CREATE', this.handleMessage);
             }   
 
@@ -1314,7 +875,6 @@ module.exports = !global.ZeresPluginLibrary ? Dummy : (([Plugin, Api]) => {
                     var targetMessage = listener.target.closest("li")?.querySelector(".contents-2MsGLg")?.__reactProps$.children[2].props.message.content;
                     var targetlink = listener.target.closest("li")?.querySelector(".contents-2MsGLg")?.__reactProps$.children[2].props.message.attachments;
                     var lastMatch = regexNew.exec(targetMessage);
-                    console.log(targetMessage)
                     if (targetlink.length > 0 || lastMatch !== null) {
                         console.log("image")
                         var sentMessage = lastMatch !== null ? lastMatch[0] : targetlink[0].url;
@@ -1405,7 +965,6 @@ module.exports = !global.ZeresPluginLibrary ? Dummy : (([Plugin, Api]) => {
                 let DMChannel = getDMFromUserId(message.author.id)
                 
                 if (message.author.id === botId) {
-                    console.log(message);
         
                     // let ack = BdApi.Webpack.getModule((m, e) => m?.toString().includes("CHANNEL_ACK") && (target = e.exports), { searchExports: true });
             
@@ -1509,14 +1068,17 @@ module.exports = !global.ZeresPluginLibrary ? Dummy : (([Plugin, Api]) => {
             
     
             onStop() {
-                observer.disconnect();
                 document.removeEventListener('keydown', this.handleKeyDown);
                 BdApi.Webpack.getModule(BdApi.Webpack.Filters.byProps("dispatch", "_actionHandlers")).unsubscribe('MESSAGE_CREATE', this.handleMessage);
-                // let index = DiscordCommands.findIndex((cmd => cmd.id == "bot2"));
-                // while (index > -1) {
-                //     DiscordCommands.splice(index, 1);
-                //     index = DiscordCommands.findIndex((cmd => cmd.id == "bot2"));
-                // }
+
+                // Patcher.after(SlashCommandStore, "Kh", (_, args, res) => {
+                //     console.log(res)
+                //     let index = res.findIndex((cmd => cmd.id == "bot2"));
+                //     while (index > -1) {
+                //         res.splice(index, 1);
+                //         index = res.findIndex((cmd => cmd.id == "bot2"));
+                //     }
+                // })
             }
     
         }
