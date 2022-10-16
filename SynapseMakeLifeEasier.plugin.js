@@ -2,7 +2,7 @@
  * @name SynapseMakeLifeEasier
  * @author yorker
  * @description makes life easier for a monke. 
- * @version 3.7.7
+ * @version 3.7.8
  * @authorId 844997173790769183
  */
 
@@ -29,7 +29,7 @@ const config = {
                 discord_id: "844997173790769183",
             }
         ],
-        version: "3.7.7",
+        version: "3.7.8",
         description: "makes staffing easier",
         github: "https://github.com/SaphoGaming/synapsemakelifeeasier/blob/main/SynapseMakeLifeEasier.plugin.js",
         github_raw: "https://raw.githubusercontent.com/SaphoGaming/synapsemakelifeeasier/main/SynapseMakeLifeEasier.plugin.js"
@@ -928,14 +928,14 @@ module.exports = !global.ZeresPluginLibrary ? Dummy : (([Plugin, Api]) => {
                         if (message3 !== undefined) {
                             obj[`${message3.author.id}`] = message3.content;
                             ComponentDispatch.dispatchToLastSubscribed("INSERT_TEXT", {
-                                plainText: `.b !auth ${message3.content}`
+                                plainText: `/b message:!auth ${message3.content}`
                             });
                         }
                     }
                     else {
                         obj[`${userDM}`] = window.getSelection().toString();
                         ComponentDispatch.dispatchToLastSubscribed("INSERT_TEXT", {
-                            plainText: `.b !auth ${window.getSelection().toString()}`
+                            plainText: `/b message:!auth ${window.getSelection().toString()}`
                         });
                     }
                    
@@ -948,7 +948,7 @@ module.exports = !global.ZeresPluginLibrary ? Dummy : (([Plugin, Api]) => {
                     let actualMsg = obj[userDM];
                     if (actualMsg == undefined) return;
                     ComponentDispatch.dispatchToLastSubscribed("INSERT_TEXT", {
-                        plainText: `.b !verf ${actualMsg}`
+                        plainText: `/b message:!verf ${actualMsg}`
                     });
                     
                   
