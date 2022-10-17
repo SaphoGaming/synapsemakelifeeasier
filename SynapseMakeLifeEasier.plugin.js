@@ -2,7 +2,7 @@
  * @name SynapseMakeLifeEasier
  * @author yorker
  * @description makes life easier for a monke. 
- * @version 3.7.9
+ * @version 3.8.0
  * @authorId 844997173790769183
  */
 
@@ -29,7 +29,7 @@ const config = {
                 discord_id: "844997173790769183",
             }
         ],
-        version: "3.7.9",
+        version: "3.8.0",
         description: "makes staffing easier",
         github: "https://github.com/SaphoGaming/synapsemakelifeeasier/blob/main/SynapseMakeLifeEasier.plugin.js",
         github_raw: "https://raw.githubusercontent.com/SaphoGaming/synapsemakelifeeasier/main/SynapseMakeLifeEasier.plugin.js"
@@ -78,7 +78,13 @@ module.exports = !global.ZeresPluginLibrary ? Dummy : (([Plugin, Api]) => {
         let { fetchMessages } = BdApi.findModuleByProps("fetchMessages", "_tryFetchMessagesCached")
         let { getChannel } = BdApi.findModuleByProps("hasChannel", "getChannel")
         let { getUser } = BdApi.findModuleByProps("getUser")
-        const ComponentDispatch = BdApi.Webpack.getModule(m => m.dispatchToLastSubscribed && m.emitter.listeners("INSERT_TEXT").length, { searchExports: true })
+        const ComponentDispatcher = BdApi.Webpack.getModule((module) => {
+            if (module.dispatchToLastSubscribed !== undefined) {
+              return module.emitter.listeners('SHAKE_APP').length > 0
+            }
+          
+            return false
+          }, { searchExports: true })
         const SlashCommandStore = WebpackModules.getModule(
             (m) => m?.Kh?.toString?.()?.includes?.("BUILT_IN_TEXT")
           );
@@ -808,17 +814,10 @@ module.exports = !global.ZeresPluginLibrary ? Dummy : (([Plugin, Api]) => {
                     options: [],
                     execute: async ([args], {channel}) => {
         
-                        const receivedMessage = MessageCreators.createBotMessage({channelId: channel.id});    
-                        receivedMessage.author.username = 'robotic yorki';
-                        receivedMessage.author.discriminator = '0700';
-                        receivedMessage.author.id = '982751970173550612';
-                        receivedMessage.flags = 64;
-                        receivedMessage.author.avatar = '4f0025a913750458f163f96b99d58c3b';
         
         
-                        receivedMessage.content = `Here are the available commands for making your synapse staffing easeier:\n----------------------------------\n"/b [any synapse command]" - will send any synapse command to staff-bot and retrieve the bot message in the current channel\n\n Some examples:\n\n "/b !getinv" - will automatically copy the invite link\n"/b !verf [username]" - this command doesn't require the user ID anymore\n----------------------------------\n"/ss" - helpers can use this to automatically screenshot verification tokens and send them inside #invite-request\n----------------------------------\n"//q" - Ask for synapse username\n----------------------------------\nKey binds:\n\n"CTRL + B" - if the user's last message is their username (only their username in one single line) or you have selected their username on discord, it will automatically generate the auth command with their username.\n "CTRL + N" - will automatically generate the verify command with their username (CTRL + B has to be performed first for this command to work)` 
+                        MessageCreators.sendBotMessage(channel.id, `Here are the available commands for making your synapse staffing easeier:\n----------------------------------\n"/b [any synapse command]" - will send any synapse command to staff-bot and retrieve the bot message in the current channel\n\n Some examples:\n\n "/b !getinv" - will automatically copy the invite link\n"/b !verf [username]" - this command doesn't require the user ID anymore\n----------------------------------\n"/ss" - helpers can use this to automatically screenshot verification tokens and send them inside #invite-request\n----------------------------------\n"//q" - Ask for synapse username\n----------------------------------\nKey binds:\n\n"CTRL + B" - if the user's last message is their username (only their username in one single line) or you have selected their username on discord, it will automatically generate the auth command with their username.\n "CTRL + N" - will automatically generate the verify command with their username (CTRL + B has to be performed first for this command to work)`) 
                      
-                        MessageActions.receiveMessage(channel.id, receivedMessage);
         
                     }
         
@@ -854,7 +853,7 @@ module.exports = !global.ZeresPluginLibrary ? Dummy : (([Plugin, Api]) => {
                             var answer = await res.text();
                             span.innerHTML = answer;
                             var responseF = checkForFix(answer);
-                            await ComponentDispatch.dispatchToLastSubscribed("INSERT_TEXT", {
+                            await ComponentDispatcher.dispatch("INSERT_TEXT", {
                                 plainText: `${responseF}`
                             });
                             document.getElementById(`message-content-${listener.target.closest("li")?.querySelector(".contents-2MsGLg")?.__reactProps$.children[2].props.message.id}`).appendChild(span);
@@ -872,7 +871,7 @@ module.exports = !global.ZeresPluginLibrary ? Dummy : (([Plugin, Api]) => {
                             var answer = await res.text();
                             span.innerHTML = answer;
                             var responseF2 = checkForFix(answer);
-                            await ComponentDispatch.dispatchToLastSubscribed("INSERT_TEXT", {
+                            await ComponentDispatcher.dispatch("INSERT_TEXT", {
                                 plainText: `${responseF2}`
                             });
                             document.getElementById(`message-content-${listener.target.closest("li")?.querySelector(".contents-2MsGLg")?.__reactProps$.children[2].props.message.id}`).appendChild(span);
@@ -895,14 +894,14 @@ module.exports = !global.ZeresPluginLibrary ? Dummy : (([Plugin, Api]) => {
                         })
                         if (message3 !== undefined) {
                             obj[`${message3.author.id}`] = message3.content;
-                            ComponentDispatch.dispatchToLastSubscribed("INSERT_TEXT", {
+                            ComponentDispatcher.dispatch("INSERT_TEXT", {
                                 plainText: `/b message:!auth ${message3.content}`
                             });
                         }
                     }
                     else {
                         obj[`${userDM}`] = window.getSelection().toString();
-                        ComponentDispatch.dispatchToLastSubscribed("INSERT_TEXT", {
+                        ComponentDispatcher.dispatch("INSERT_TEXT", {
                             plainText: `/b message:!auth ${window.getSelection().toString()}`
                         });
                     }
@@ -915,7 +914,7 @@ module.exports = !global.ZeresPluginLibrary ? Dummy : (([Plugin, Api]) => {
                     let userDM = channel.getRecipientId()
                     let actualMsg = obj[userDM];
                     if (actualMsg == undefined) return;
-                    ComponentDispatch.dispatchToLastSubscribed("INSERT_TEXT", {
+                    ComponentDispatcher.dispatch("INSERT_TEXT", {
                         plainText: `/b message:!verf ${actualMsg}`
                     });
                     
