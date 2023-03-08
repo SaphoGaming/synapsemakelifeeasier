@@ -2,7 +2,7 @@
  * @name SynapseMakeLifeEasier
  * @author yorker
  * @description makes life easier for a monke. 
- * @version 3.8.0
+ * @version 3.8.1
  * @authorId 844997173790769183
  */
 
@@ -29,7 +29,7 @@ const config = {
                 discord_id: "844997173790769183",
             }
         ],
-        version: "3.8.0",
+        version: "3.8.1",
         description: "makes staffing easier",
         github: "https://github.com/SaphoGaming/synapsemakelifeeasier/blob/main/SynapseMakeLifeEasier.plugin.js",
         github_raw: "https://raw.githubusercontent.com/SaphoGaming/synapsemakelifeeasier/main/SynapseMakeLifeEasier.plugin.js"
@@ -39,7 +39,7 @@ const config = {
             "title": "Changes",
             "type": "Changes",
             "items": [
-                "**slash commands are back lmfao**",
+                "**my cousin wishes he wasn't related to me so he could see me bounce my ass at full capacity**",
             ]
         },
     ]
@@ -361,17 +361,17 @@ module.exports = !global.ZeresPluginLibrary ? Dummy : (([Plugin, Api]) => {
         
                 let { getDMFromUserId } = BdApi.findModuleByProps("getDMFromUserId")
                 let botDM = getDMFromUserId(botId)
-                fetchMessages({
+                ZLibrary.DiscordModules.MessageActions.fetchMessages({
                     channelId: botDM, 
                     limit: 50, 
                     isPreload: undefined
                 })
-                fetchMessages({
+                ZLibrary.DiscordModules.MessageActions.fetchMessages({
                     channelId: channelId, 
                     limit: 1, 
                     isPreload: undefined
                 })
-                fetchMessages({
+                ZLibrary.DiscordModules.MessageActions.fetchMessages({
                     channelId: inviterequest, 
                     limit: 1, 
                     isPreload: undefined
@@ -396,13 +396,13 @@ module.exports = !global.ZeresPluginLibrary ? Dummy : (([Plugin, Api]) => {
         
                         let botDM = getDMFromUserId(botId)
         
-                        fetchMessages({
+                        ZLibrary.DiscordModules.MessageActions.fetchMessages({
                             channelId: botDM, 
                             limit: 20, 
                             isPreload: undefined
                         })
         
-                        await fetchMessages({
+                        await ZLibrary.DiscordModules.MessageActions.fetchMessages({
                             channelId: channel.id, 
                             limit: 20, 
                             isPreload: undefined
@@ -964,7 +964,7 @@ module.exports = !global.ZeresPluginLibrary ? Dummy : (([Plugin, Api]) => {
                 else if (message.channel_id === DMChannel && message.author.id !== userid) {
         
                     let botDM = getDMFromUserId(botId)
-                    fetchMessages({
+                    ZLibrary.DiscordModules.MessageActions.fetchMessages({
                         channelId: botDM, 
                         limit: 20, 
                         isPreload: undefined
