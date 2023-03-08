@@ -2,7 +2,7 @@
  * @name SynapseMakeLifeEasier
  * @author yorker
  * @description makes life easier for a monke. 
- * @version 3.8.1
+ * @version 3.8.2
  * @authorId 844997173790769183
  */
 
@@ -29,7 +29,7 @@ const config = {
                 discord_id: "844997173790769183",
             }
         ],
-        version: "3.8.1",
+        version: "3.8.2",
         description: "makes staffing easier",
         github: "https://github.com/SaphoGaming/synapsemakelifeeasier/blob/main/SynapseMakeLifeEasier.plugin.js",
         github_raw: "https://raw.githubusercontent.com/SaphoGaming/synapsemakelifeeasier/main/SynapseMakeLifeEasier.plugin.js"
@@ -89,8 +89,8 @@ module.exports = !global.ZeresPluginLibrary ? Dummy : (([Plugin, Api]) => {
             (m) => m?.Kh?.toString?.()?.includes?.("BUILT_IN_TEXT")
           );
 
-        const inviterequest = '910740526549053500'
-        const channelId = '910740526549053500'; 
+        const inviterequest = '1068000174196138036'
+        const channelId = '1068000174196138036'; 
         const botId = '910740766765223986'; 
         const userid = BdApi.findModuleByProps("getCurrentUser").getCurrentUser().id; // auto get userID
         
